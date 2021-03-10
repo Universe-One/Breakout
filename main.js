@@ -1,5 +1,5 @@
 // TODO
-// MOVEMENT EXTREMELY CHOPPY SOMETMIES WHEN SWITCHING DIRECTIONS
+
 // Color of brick = how many more times it has to be hit to break. Darker bricks require more hits to break
 // 
 
@@ -20,33 +20,26 @@ window.addEventListener("keydown", function(e) {
 	switch (e.code) {
 		case "KeyA":
 		case "ArrowLeft":
-			paddle.direction = "left";
-			console.log("left");
-			paddle.isMoving = true;
+			paddle.direction[0] = 1;
 			break;
 		case "KeyD":
 		case "ArrowRight":
-			paddle.direction = "right";
-			console.log("right");
-			paddle.isMoving = true;
+			paddle.direction[1] = 1;
 			break;
 	}
 });
 
-// When user releases direction key, set direction to null.
+// When letting go of a direction, only set the direction to null if another direction is not
+// already being pressed. This check is necessary for smooth paddle movement.
 window.addEventListener("keyup", function(e) {
 	switch (e.code) {
 		case "KeyA":
 		case "ArrowLeft":
-			if (paddle.direction !== "right") {
-				paddle.direction = null;
-			}
+			paddle.direction[0] = 0;
 			break;
 		case "KeyD":
 		case "ArrowRight":
-			if (paddle.direction !== "left") {
-				paddle.direction = null;
-			}
+			paddle.direction[1] = 0;
 			break;
 	}
 });
@@ -63,8 +56,6 @@ const game = {
 	loop: function() {
 		canvas.clear();
 		paddle.draw();
-
-		// Possibly rename to "handleMovement" or rethink structure
 		paddle.handleMovement();
 
 		// Establish the game loop. window.requestAnimationFrame runs its callback function before
@@ -82,7 +73,6 @@ const ball = {
 
 
 const paddle = {
-	//isMoving: false,
 
 	// The paddle should initially be drawn at the middle of the screen. However, fillRect treats
 	// the x argument as the left edge of the paddle, so we need to subtract half of the width of
@@ -106,22 +96,21 @@ const paddle = {
 	width: 80,
 	height: 16,
 	moveSpeed: 5,
-	direction: null,
+	// direction[0] is left direction and direction[1] is right direction. If a direction key is pressed, that
+	// pressed direction is represented by a 1. If it is not pressed, it is represented by a 0. Thus,
+	// [0, 0] amd [1, 1] mean no movement. [1, 0] means move left. [0, 1] means move right.
+	// direction is stored in this way to deal cases in which both direction keys are being pressed.
+	direction: [0, 0],
 	color: "rgb(0, 190, 255)",
 	draw: function() {
 		ctx.fillStyle = this.color;
 		ctx.fillRect(this.xPos, this.yPos, this.width, this.height);
 	},
 	handleMovement: function() {
-		if (this.direction === "right" && this.xPos < canvas.width - this.width) {
+		if (this.direction[0] === 0 && this.direction[1] === 1 && this.xPos < canvas.width - this.width) {
 			this.xPos += this.moveSpeed;
-			//console.log("right");
-		} else if (this.direction === "left" && this.xPos > 0) {
+		} else if (this.direction[0] === 1 && this.direction[1] === 0 && this.xPos > 0) {
 			this.xPos -= this.moveSpeed;
-			//console.log("left");
-		}
-		if (this.direction === null) {
-			console.log("null");
 		}
 	}
 }
