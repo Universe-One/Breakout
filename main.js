@@ -1,7 +1,7 @@
 // TODO
-// Figure out a way around keypress delay, possibly use keypress to set variable and check if variable is set in game loop.
+// MOVEMENT EXTREMELY CHOPPY SOMETMIES WHEN SWITCHING DIRECTIONS
 // Color of brick = how many more times it has to be hit to break. Darker bricks require more hits to break
-// CONFINE PADDLE TO PLAY AREA
+// 
 
 
 // The element references have "Elem" suffixes to differentiate them from variables used in the program.
@@ -21,10 +21,14 @@ window.addEventListener("keydown", function(e) {
 		case "KeyA":
 		case "ArrowLeft":
 			paddle.direction = "left";
+			console.log("left");
+			paddle.isMoving = true;
 			break;
 		case "KeyD":
 		case "ArrowRight":
 			paddle.direction = "right";
+			console.log("right");
+			paddle.isMoving = true;
 			break;
 	}
 });
@@ -34,9 +38,15 @@ window.addEventListener("keyup", function(e) {
 	switch (e.code) {
 		case "KeyA":
 		case "ArrowLeft":
+			if (paddle.direction !== "right") {
+				paddle.direction = null;
+			}
+			break;
 		case "KeyD":
 		case "ArrowRight":
-			paddle.direction = null;
+			if (paddle.direction !== "left") {
+				paddle.direction = null;
+			}
 			break;
 	}
 });
@@ -64,11 +74,16 @@ const game = {
 	}
 }
 
-// Enter the game loop
-window.requestAnimationFrame(game.loop);
+const ball = {
+	draw: function() {
+		
+	}
+}
 
 
 const paddle = {
+	//isMoving: false,
+
 	// The paddle should initially be drawn at the middle of the screen. However, fillRect treats
 	// the x argument as the left edge of the paddle, so we need to subtract half of the width of
 	// the paddle to center it. A getter function is used so that the width of the paddle can be
@@ -92,21 +107,24 @@ const paddle = {
 	height: 16,
 	moveSpeed: 5,
 	direction: null,
+	color: "rgb(0, 190, 255)",
 	draw: function() {
-		ctx.fillStyle = "rgb(0, 190, 255)";
+		ctx.fillStyle = this.color;
 		ctx.fillRect(this.xPos, this.yPos, this.width, this.height);
 	},
 	handleMovement: function() {
 		if (this.direction === "right" && this.xPos < canvas.width - this.width) {
-
-			// +/- of xPos has to be related to paddle with atm
-
 			this.xPos += this.moveSpeed;
+			//console.log("right");
 		} else if (this.direction === "left" && this.xPos > 0) {
 			this.xPos -= this.moveSpeed;
+			//console.log("left");
 		}
-		console.log(this.xPos);
+		if (this.direction === null) {
+			console.log("null");
+		}
 	}
 }
 
-paddle.draw();
+// Enter the game loop
+window.requestAnimationFrame(game.loop);
