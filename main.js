@@ -24,7 +24,6 @@ const game = {
 	// When the paddle and ball are in the desired position, the player may start the game
 	// by pressing the Space button, which will send the ball bouncing.
 	preStart: true,
-
 	startListener: function(e) {
 		if (e.code === "Space") {
 			game.start();
@@ -36,14 +35,19 @@ const game = {
 	start: function() {
 		this.preStart = false;
 		window.removeEventListener("keydown", game.startListener);
+
+		// EXTREMELY SIMPLE IMPLEMENTATION OF BALL MOVEMENT
+		// CHANGE LATER. Current values are just to test if collision detection is working properly.
+		ball.xVel = 2;
+		ball.yVel = 2;
 	},
 
 	loop: function() {
 		canvas.clear();
-		ball.draw();
-		ball.move();
-		paddle.draw();
 		paddle.handleMovement();
+		paddle.draw();
+		ball.move();
+		ball.draw();
 
 		// Establish the game loop. window.requestAnimationFrame runs its callback function before
 		// the browser performs the next repaint. This often happens 60 times per second, but will
@@ -87,17 +91,17 @@ const paddle = {
 	},
 	handleMovement: function() {
 		if (this.direction[0] === 0 && this.direction[1] === 1 && this.xPos < canvas.width - this.width) {
+			this.xPos += this.moveSpeed;
 			// If the game is in the pre-start state, the ball's movement follows the paddle's movement.
 			// This makes it appear as though the ball is stuck to the center of the paddle.
 			if (game.preStart) {
 				ball.xPos += this.moveSpeed;
 			}
-			this.xPos += this.moveSpeed;
 		} else if (this.direction[0] === 1 && this.direction[1] === 0 && this.xPos > 0) {
+			this.xPos -= this.moveSpeed;
 			if (game.preStart) {
 				ball.xPos -= this.moveSpeed;
 			}
-			this.xPos -= this.moveSpeed;
 		}
 	}
 }
@@ -127,19 +131,50 @@ const ball = {
 	},
 	move: function() {
 		ctx.arc(this.xPos += this.xVel, this.yPos -= this.yVel, this.size, 0, 2 * Math.PI);
+		this.detectCollision();
+	},
+	detectCollision: function() {
+		if (this.xPos >= canvas.width) {
+
+			// Not Working
+			window.cancelAnimationFrame(game.requestId);
+			console.log(game.requestId);
+			console.log("right wall hit");
+		}
 	}
 }
 
-const Brick = function() {
-	console.log("I'm a brick!");
+const Brick = function(xPos, yPos, hitsLeft) {
+	this.xPos = null;
+	this.yPos = null;
+	this.width = 60;
+	this.height = 10;
+	this.hitsLeft = hitsLeft;
+	// The shade of the brick signifies how many hits are required to break it. Darker bricks require more 
+	// hits to break.
+	switch (this.hitsLeft) {
+		case 1:
+			this.color = "rgb(0, 255, 0)";
+			break;
+		case 2:
+			this.color = "rgb(0, 192, 0)";
+			break;
+		case 3:
+			this.color = "rgb(0, 128, 0)";
+			break;
+	}
+
+	this.draw();
 }
 
-for (let i = 0; i < 10; i++) {
-	const brick = new Brick();
-}
+Brick.prototype.draw = function() {
+	ctx.fillStyle = this.color;
+	ctx.fillRect(this.xPos, this.yPos, this.width, this.height);
+};
 
-// Enter the game loop
-window.requestAnimationFrame(game.loop);
+for (let i = 0; i < 5; i++) {
+	const brick = new Brick(this.width + i, 100, 2);
+}
 
 // Keyboard controls
 // The keydown event fires when a key is first pressed, and then after a delay, continuously fires if the key 
@@ -174,6 +209,9 @@ window.addEventListener("keyup", function(e) {
 			break;
 	}
 });
+
+// Enter the game loop
+window.requestAnimationFrame(game.loop);
 
 // This listener puts the ball in play. When the ball is launched, this listener is removed.
 // It is again added when a life is lost and the next ball is ready to be launched, or when
