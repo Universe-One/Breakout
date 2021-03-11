@@ -38,8 +38,8 @@ const game = {
 
 		// EXTREMELY SIMPLE IMPLEMENTATION OF BALL MOVEMENT
 		// CHANGE LATER. Current values are just to test if collision detection is working properly.
-		ball.xVel = 2;
-		ball.yVel = 2;
+		ball.xVel = ball.speed;
+		ball.yVel = ball.speed;
 	},
 
 	loop: function() {
@@ -111,7 +111,11 @@ const ball = {
 	// Getter method is used for ball's yPos since its initial position is related to its size, and
 	// the size needs to be referred to with the this keyword.
 	get yPos() {
-		return this._yPos || canvas.height - (paddle.height * 2) - this.size;
+		// Nullish coalescing operator is used instead of OR operator to handle the case when
+		// this._yPos equals 0. If the OR operator is used, the left operand evaluates to false,
+		// resetting the y position of the ball to the bottom of the screen. This is not the
+		// intended behavior.
+		return this._yPos ?? canvas.height - (paddle.height * 2) - this.size;
 	},
 	// Since yPos is accessed with a getter method, a setter method is necessary to change its value
 	set yPos(value) {
@@ -120,6 +124,7 @@ const ball = {
 	xVel: 0,
 	yVel: 0,
 	size: 8,
+	speed: 2,
 	color: "rgb(0, 0, 255)",
 	draw: function() {
 		ctx.fillStyle = this.color;
@@ -134,12 +139,18 @@ const ball = {
 		this.detectCollision();
 	},
 	detectCollision: function() {
-		if (this.xPos >= canvas.width) {
-
-			// Not Working
-			window.cancelAnimationFrame(game.requestId);
-			console.log(game.requestId);
-			console.log("right wall hit");
+		// Detect collision with left and right walls
+		if (this.xPos <= 0 + this.size || this.xPos >= canvas.width - this.size) {
+			this.xVel = -(this.xVel);
+		}
+		// Detect collision with top wall
+		if (this.yPos <= 0 + this.size) {
+			this.yVel = -(this.yVel);
+		// Detect collision with bottom wall. If the ball ever collides with the bottom wall, a life is lost
+		// and the game reenters the preStart state in which the ball sits atop the paddle waiting to be 
+		// launched again.
+		} else if (this.yPos >= canvas.height - this.size) {
+			console.log("Dead");
 		}
 	}
 }
