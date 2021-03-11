@@ -55,6 +55,7 @@ const canvas = {
 const game = {
 	loop: function() {
 		canvas.clear();
+		ball.draw();
 		paddle.draw();
 		paddle.handleMovement();
 
@@ -65,15 +66,7 @@ const game = {
 	}
 }
 
-const ball = {
-	draw: function() {
-		
-	}
-}
-
-
 const paddle = {
-
 	// The paddle should initially be drawn at the middle of the screen. However, fillRect treats
 	// the x argument as the left edge of the paddle, so we need to subtract half of the width of
 	// the paddle to center it. A getter function is used so that the width of the paddle can be
@@ -92,7 +85,7 @@ const paddle = {
 	},
 	// width and moveSpeed values should be carefully chosen based on the value of the other, canvas.width, and
 	// the starting xPos to ensure that the paddle remains perfectly confined to the canvas (play area).
-	yPos: 360,
+	yPos: 368,
 	width: 80,
 	height: 16,
 	moveSpeed: 5,
@@ -113,6 +106,27 @@ const paddle = {
 			this.xPos -= this.moveSpeed;
 		}
 	}
+}
+
+const ball = {
+	size: 8,
+	color: "rgb(0, 0, 255)",
+	draw: function() {
+		ctx.fillStyle = this.color;
+		ctx.beginPath();
+		// 2 * pi radians is equal to 360 degrees. This draws a full circle. The values of the first and second
+		// arguments are chosen to ensure that the ball is drawn sitting just on top of the middle of the paddle.
+		ctx.arc(canvas.width / 2, canvas.height - (paddle.height * 2) - this.size, this.size, 0, 2 * Math.PI);
+		ctx.fill();
+	}
+}
+
+const Brick = function() {
+	console.log("I'm a brick!");
+}
+
+for (let i = 0; i < 10; i++) {
+	const brick = new Brick();
 }
 
 // Enter the game loop
