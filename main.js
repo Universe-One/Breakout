@@ -1,7 +1,7 @@
 // TODO
 
 // Color of brick = how many more times it has to be hit to break. Darker bricks require more hits to break
-// 
+// ball not moving with paddle in preStart state in LIVE DEMO
 
 
 // The element references have "Elem" suffixes to differentiate them from variables used in the program.
@@ -9,40 +9,6 @@ const canvasElem = document.querySelector("#game-canvas");
 const ctx = canvasElem.getContext("2d");
 const scoreElem = document.querySelector("#current-score");
 const highScoreElem = document.querySelector("#high-score");
-
-// Keyboard controls
-// The keydown event fires when a key is first pressed, and then after a delay, continuously fires if the key 
-// is held down. As a result of this delay, paddle.handleMovement() is not smooth if called directly here. 
-// To solve this issue, physically moving the paddle is done every update of the game loop and the keyboard controls 
-// simply change the paddle direction property. When a key is pressed, the paddle direction property is set to
-// the appropriate direction until that key is lifted, at which point the paddle direction property is set back to null.
-window.addEventListener("keydown", function(e) {
-	switch (e.code) {
-		case "KeyA":
-		case "ArrowLeft":
-			paddle.direction[0] = 1;
-			break;
-		case "KeyD":
-		case "ArrowRight":
-			paddle.direction[1] = 1;
-			break;
-	}
-});
-
-// When letting go of a direction, only set the direction to null if another direction is not
-// already being pressed. This check is necessary for smooth paddle movement.
-window.addEventListener("keyup", function(e) {
-	switch (e.code) {
-		case "KeyA":
-		case "ArrowLeft":
-			paddle.direction[0] = 0;
-			break;
-		case "KeyD":
-		case "ArrowRight":
-			paddle.direction[1] = 0;
-			break;
-	}
-});
 
 const canvas = {
 	width: canvasElem.width,
@@ -58,6 +24,20 @@ const game = {
 	// When the paddle and ball are in the desired position, the player may start the game
 	// by pressing the Space button, which will send the ball bouncing.
 	preStart: true,
+
+	startListener: function(e) {
+		if (e.code === "Space") {
+			game.start();
+		}
+	},
+
+	// start refers to putting the current ball in play. If all lives are lost, the user will have
+	// the opportunity to reset the game and play again.
+	start: function() {
+		this.preStart = false;
+		window.removeEventListener("keydown", game.startListener);
+	},
+
 	loop: function() {
 		canvas.clear();
 		ball.draw();
@@ -160,3 +140,42 @@ for (let i = 0; i < 10; i++) {
 
 // Enter the game loop
 window.requestAnimationFrame(game.loop);
+
+// Keyboard controls
+// The keydown event fires when a key is first pressed, and then after a delay, continuously fires if the key 
+// is held down. As a result of this delay, paddle.handleMovement() is not smooth if called directly here. 
+// To solve this issue, physically moving the paddle is done every update of the game loop and the keyboard controls 
+// simply change the paddle direction property. When a key is pressed, the paddle direction property is set to
+// the appropriate direction until that key is lifted, at which point the paddle direction property is set back to null.
+window.addEventListener("keydown", function(e) {
+	switch (e.code) {
+		case "KeyA":
+		case "ArrowLeft":
+			paddle.direction[0] = 1;
+			break;
+		case "KeyD":
+		case "ArrowRight":
+			paddle.direction[1] = 1;
+			break;
+	}
+});
+
+// When letting go of a direction, only set the direction to null if another direction is not
+// already being pressed. This check is necessary for smooth paddle movement.
+window.addEventListener("keyup", function(e) {
+	switch (e.code) {
+		case "KeyA":
+		case "ArrowLeft":
+			paddle.direction[0] = 0;
+			break;
+		case "KeyD":
+		case "ArrowRight":
+			paddle.direction[1] = 0;
+			break;
+	}
+});
+
+// This listener puts the ball in play. When the ball is launched, this listener is removed.
+// It is again added when a life is lost and the next ball is ready to be launched, or when
+// the game is reset, and a new game begins.
+window.addEventListener("keydown", game.startListener);
