@@ -53,9 +53,15 @@ const canvas = {
 }
 
 const game = {
+	// preStart is true when the game first loads, a life is lost, or when the game is reset.
+	// In this state, the player will be able to move the paddle with the ball on it.
+	// When the paddle and ball are in the desired position, the player may start the game
+	// by pressing the Space button, which will send the ball bouncing.
+	preStart: true,
 	loop: function() {
 		canvas.clear();
 		ball.draw();
+		ball.move();
 		paddle.draw();
 		paddle.handleMovement();
 
@@ -101,14 +107,34 @@ const paddle = {
 	},
 	handleMovement: function() {
 		if (this.direction[0] === 0 && this.direction[1] === 1 && this.xPos < canvas.width - this.width) {
+			// If the game is in the pre-start state, the ball's movement follows the paddle's movement.
+			// This makes it appear as though the ball is stuck to the center of the paddle.
+			if (game.preStart) {
+				ball.xPos += this.moveSpeed;
+			}
 			this.xPos += this.moveSpeed;
 		} else if (this.direction[0] === 1 && this.direction[1] === 0 && this.xPos > 0) {
+			if (game.preStart) {
+				ball.xPos -= this.moveSpeed;
+			}
 			this.xPos -= this.moveSpeed;
 		}
 	}
 }
 
 const ball = {
+	xPos: canvas.width / 2,
+	// Getter method is used for ball's yPos since its initial position is related to its size, and
+	// the size needs to be referred to with the this keyword.
+	get yPos() {
+		return this._yPos || canvas.height - (paddle.height * 2) - this.size;
+	},
+	// Since yPos is accessed with a getter method, a setter method is necessary to change its value
+	set yPos(value) {
+		this._yPos = value;
+	},
+	xVel: 0,
+	yVel: 0,
 	size: 8,
 	color: "rgb(0, 0, 255)",
 	draw: function() {
@@ -116,8 +142,11 @@ const ball = {
 		ctx.beginPath();
 		// 2 * pi radians is equal to 360 degrees. This draws a full circle. The values of the first and second
 		// arguments are chosen to ensure that the ball is drawn sitting just on top of the middle of the paddle.
-		ctx.arc(canvas.width / 2, canvas.height - (paddle.height * 2) - this.size, this.size, 0, 2 * Math.PI);
+		ctx.arc(this.xPos, this.yPos, this.size, 0, 2 * Math.PI);
 		ctx.fill();
+	},
+	move: function() {
+		ctx.arc(this.xPos += this.xVel, this.yPos -= this.yVel, this.size, 0, 2 * Math.PI);
 	}
 }
 
