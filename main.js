@@ -7,6 +7,10 @@
 // The element references have "Elem" suffixes to differentiate them from variables used in the program.
 const canvasElem = document.querySelector("#game-canvas");
 const ctx = canvasElem.getContext("2d");
+// canvas variables suffixed with a 2 are related to the display on the bottom right corner of the
+// canvas container showing how many balls (lives) the player has left.
+const canvasElem2 = document.querySelector("#lives-canvas");
+const ctx2 = canvasElem2.getContext("2d");
 const scoreElem = document.querySelector("#current-score");
 const highScoreElem = document.querySelector("#high-score");
 
@@ -15,6 +19,12 @@ const canvas = {
 	height: canvasElem.height,
 	clear: function() {
 		ctx.clearRect(0, 0, this.width, this.height);
+	},
+	drawBallIcon: function() {
+		ctx2.fillStyle = ball.color;
+		ctx2.beginPath();
+		ctx2.arc(0, 0, 10, 0, 2 * Math.PI);
+		ctx2.fill();
 	}
 }
 
@@ -24,6 +34,7 @@ const game = {
 	// When the paddle and ball are in the desired position, the player may start the game
 	// by pressing the Space button, which will send the ball bouncing.
 	preStart: true,
+	lives: 5, // Change this value to 3 before production
 	startListener: function(e) {
 		if (e.code === "Space") {
 			game.start();
@@ -53,6 +64,15 @@ const game = {
 		// the browser performs the next repaint. This often happens 60 times per second, but will
 		// generally match the display refresh rate in most web browsers.
 		window.requestAnimationFrame(game.loop);
+	},
+
+	displayLives: function() {
+		// The lives display panel will show ball icons based on how many lives the player has left.
+		// It will display one fewer ball than the player has lives because the current ball in play
+		// represents one life.
+		for (i = 0; i < this.lives - 1; i++) {
+			canvas.drawBallIcon();
+		}
 	}
 }
 
@@ -151,6 +171,8 @@ const ball = {
 		// launched again.
 		} else if (this.yPos >= canvas.height - this.size) {
 			console.log("Dead");
+			game.lives -= 1;
+			game.preStart = true;
 		}
 	}
 }
@@ -228,3 +250,5 @@ window.requestAnimationFrame(game.loop);
 // It is again added when a life is lost and the next ball is ready to be launched, or when
 // the game is reset, and a new game begins.
 window.addEventListener("keydown", game.startListener);
+
+canvas.drawBallIcon();
