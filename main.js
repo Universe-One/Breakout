@@ -78,7 +78,9 @@ const game = {
 	// When the paddle and ball are in the desired position, the player may start the game
 	// by pressing the Space button, which will send the ball bouncing.
 	preStart: true,
+	isOver: false,
 	lives: 2, // 5 is the maximum number of lives that a player can accumulate.
+	requestId: null,
 	startListener: function(e) {
 		if (e.code === "Space") {
 			game.start();
@@ -97,6 +99,8 @@ const game = {
 		ball.yVel = ball.speed;
 	},
 
+	// The this keyword must not be used in the game.loop function because it is called from
+	// window.requestAnimationFrame().
 	loop: function() {
 		canvas.clear();
 		paddle.handleMovement();
@@ -104,18 +108,35 @@ const game = {
 		ball.move();
 		ball.draw();
 
+		//console.log(game.requestId);
+
+		
 		// Establish the game loop. window.requestAnimationFrame runs its callback function before
 		// the browser performs the next repaint. This often happens 60 times per second, but will
 		// generally match the display refresh rate in most web browsers.
-		window.requestAnimationFrame(game.loop);
+		game.requestId = window.requestAnimationFrame(game.loop);
+		
+		// Exit the game loop
+		if (game.isOver) {
+			window.cancelAnimationFrame(game.requestId);
+		}
 	},
 	gameOver: function() {
+		// Check if this is being used anywhere
+
+		this.isOver = true;
 		// When the game ends, move the ball up one pixel from the death plane so it doesn't continue
 		// to trigger the collision detection code.
 		ball.yPos -= ball.size + 1;
 		console.log("Game Over!");
+
+		// Show game over screen
+		ctx.fillStyle = "#CCCCCC";
+		ctx.fillRect(100, 140, 200, 120);
 	}
 }
+
+
 
 const paddle = {
 	// The paddle should initially be drawn at the middle of the screen. However, fillRect treats
@@ -270,9 +291,9 @@ Brick.prototype.draw = function() {
 	ctx.fillRect(this.xPos, this.yPos, this.width, this.height);
 };
 
-for (let i = 0; i < 5; i++) {
+/*for (let i = 0; i < 5; i++) {
 	const brick = new Brick(this.width + i, 100, 2);
-}
+}*/
 
 // Keyboard controls
 // The keydown event fires when a key is first pressed, and then after a delay, continuously fires if the key 
@@ -310,6 +331,7 @@ window.addEventListener("keyup", function(e) {
 
 // Enter the game loop
 window.requestAnimationFrame(game.loop);
+
 
 // This listener puts the ball in play. When the ball is launched, this listener is removed.
 // It is again added when a life is lost and the next ball is ready to be launched, or when
