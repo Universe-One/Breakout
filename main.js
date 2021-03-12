@@ -1,7 +1,7 @@
 // TODO
 
 // look for more appealing hues of bricks
-// 
+// Fix lives panel update
 // Redundant comments occur over every instance of a design pattern. Rewrite these comments to appear once ath
 // the beginning of the program or only the first time a design pattern occurs.
 
@@ -50,6 +50,10 @@ const canvas2 = {
 			this.drawBallIcon();
 			this.xPosBall -= 25;
 		}
+	},
+
+	clear: function() {
+		ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
 	},
 
 	// Draw an icon that visually matches the ball. These icons are used to represent lives remaining.
@@ -169,7 +173,7 @@ const ball = {
 	xVel: 0,
 	yVel: 0,
 	size: 8,
-	speed: 2,
+	speed: 10,
 	color: "rgb(0, 0, 255)",
 	draw: function() {
 		ctx.fillStyle = this.color;
@@ -191,13 +195,26 @@ const ball = {
 		// Detect collision with top wall
 		if (this.yPos <= 0 + this.size) {
 			this.yVel = -(this.yVel);
-		// Detect collision with bottom wall. If the ball ever collides with the bottom wall, a life is lost
-		// and the game reenters the preStart state in which the ball sits atop the paddle waiting to be 
+		// Detect collision with an "imaginary" plane below the bottom of the canvas. If the ball ever collides with this plane,
+		// a life is lost and the game reenters the preStart state in which the ball sits atop the paddle waiting to be 
 		// launched again.
-		} else if (this.yPos >= canvas.height - this.size) {
+
+		// Maybe explain reason why this is better than detecting collision with the actual bottom of the screen.
+		// Also, tweak value.
+		} else if (this.yPos >= canvas.height + 100 && !game.preStart) {
 			console.log("Dead");
+			
+			// Refactor the following into RESET HANDLER FUNCTION
 			game.lives -= 1;
+			canvas2.clear();
+			canvas2.displayLives();
+			// Spawn a new ball on top of the center of the paddle.
+			ball.xPos = paddle.xPos + paddle.width / 2;
+			ball.yPos = canvas.height - (paddle.height * 2) - this.size;
+			ball.xVel = 0;
+			ball.yVel = 0;
 			game.preStart = true;
+			window.addEventListener("keydown", game.startListener);
 		}
 	}
 }
@@ -276,4 +293,5 @@ window.requestAnimationFrame(game.loop);
 // the game is reset, and a new game begins.
 window.addEventListener("keydown", game.startListener);
 
+// inside some init function
 canvas2.displayLives();
