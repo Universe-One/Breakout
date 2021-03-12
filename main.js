@@ -21,6 +21,13 @@ const canvas = {
 	height: canvasElem.height,
 	clear: function() {
 		ctx.clearRect(0, 0, this.width, this.height);
+	},
+	drawText: function(text, font, color, xPos, yPos) {
+		ctx.fillStyle = color;
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
+		ctx.font = font;
+		ctx.fillText(text, xPos, yPos);
 	}
 }
 
@@ -108,9 +115,6 @@ const game = {
 		ball.move();
 		ball.draw();
 
-		//console.log(game.requestId);
-
-		
 		// Establish the game loop. window.requestAnimationFrame runs its callback function before
 		// the browser performs the next repaint. This often happens 60 times per second, but will
 		// generally match the display refresh rate in most web browsers.
@@ -122,17 +126,19 @@ const game = {
 		}
 	},
 	gameOver: function() {
-		// Check if this is being used anywhere
-
 		this.isOver = true;
 		// When the game ends, move the ball up one pixel from the death plane so it doesn't continue
 		// to trigger the collision detection code.
 		ball.yPos -= ball.size + 1;
-		console.log("Game Over!");
 
 		// Show game over screen
 		ctx.fillStyle = "#CCCCCC";
 		ctx.fillRect(100, 140, 200, 120);
+
+		// Prompt user to start a new game by pressing Space
+		canvas.drawText("Game Over!", "2em monospace", "#000000", canvas.width / 2, canvas.height / 2 - 20);
+		canvas.drawText("Press Space", "1.2em monospace", "#000000", canvas.width / 2, canvas.height / 2 + 10);
+		canvas.drawText("to Restart", "1.2em monospace", "#000000", canvas.width / 2, canvas.height /2 + 28);
 	}
 }
 
