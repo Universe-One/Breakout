@@ -131,6 +131,9 @@ const game = {
 		// to trigger the collision detection code.
 		ball.yPos -= ball.size + 1;
 
+		// Add a listener that resets the game when space is pressed.
+		window.addEventListener("keydown", this.resetListener);
+
 		// Show game over screen
 		ctx.fillStyle = "#CCCCCC";
 		ctx.fillRect(100, 140, 200, 120);
@@ -139,6 +142,36 @@ const game = {
 		canvas.drawText("Game Over!", "2em monospace", "#000000", canvas.width / 2, canvas.height / 2 - 20);
 		canvas.drawText("Press Space", "1.2em monospace", "#000000", canvas.width / 2, canvas.height / 2 + 10);
 		canvas.drawText("to Restart", "1.2em monospace", "#000000", canvas.width / 2, canvas.height /2 + 28);
+	},
+
+	// Add listener when game is over, allowing game to be reset when Space is pressed.
+	// Remove listener when Space is pressed and game is reset.
+	// Since the listener is added to the window object, game.reset() must be used.
+	// this.reset() does not work because the keyword this refers to the window object.
+	resetListener: function(e) {
+		if (e.code === "Space") {
+			//setInterval(game.reset, 1000);
+			game.reset();
+		}
+	},
+
+	// Reset the game, preparing it to be played again.
+	reset: function() {
+		window.removeEventListener("keydown", this.resetListener);
+
+		// Possibly refactor the following into an init-type function
+
+		game.isOver = false;
+		game.preStart = true;
+		game.lives = 2;
+		canvas2.displayLives();
+		paddle.xPos = (canvas.width / 2) - (paddle.width / 2);
+		ball.xPos = paddle.xPos + paddle.width / 2;
+		ball.yPos = canvas.height - (paddle.height * 2) - ball.size;
+
+		window.addEventListener("keydown", game.startListener);
+		
+		game.requestId = window.requestAnimationFrame(game.loop);
 	}
 }
 
@@ -195,7 +228,7 @@ const paddle = {
 }
 
 const ball = {
-	xPos: canvas.width / 2,
+	xPos: paddle.xPos + paddle.width / 2,
 	// Getter method is used for ball's yPos since its initial position is related to its size, and
 	// the size needs to be referred to with the this keyword.
 	get yPos() {
@@ -259,6 +292,9 @@ const ball = {
 				ball.xPos = paddle.xPos + paddle.width / 2;
 				ball.yPos = canvas.height - (paddle.height * 2) - this.size;
 				
+				// game.preStart is used to determine if a ball should rest atop the paddle. When a life is lost and at least
+				// 1 life remains, then this should happen. If the final life is lost, a ball should not be placed atop the paddle
+				// since it is game over. If the users restarts the game, then a ball will once again rest atop the paddle.
 				game.preStart = true;
 				window.addEventListener("keydown", game.startListener);
 			} else {
