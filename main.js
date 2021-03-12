@@ -4,6 +4,7 @@
 // Fix lives panel update
 // Redundant comments occur over every instance of a design pattern. Rewrite these comments to appear once ath
 // the beginning of the program or only the first time a design pattern occurs.
+// Confine lives from 0/1-5 and update lives panel to reflect that
 
 // The element references have "Elem" suffixes to differentiate them from variables used in the program.
 const canvasElem = document.querySelector("#game-canvas");
@@ -50,6 +51,11 @@ const canvas2 = {
 			this.drawBallIcon();
 			this.xPosBall -= 25;
 		}
+		// Reset this.xPosBall's value to the initial position at the right of the panel. If this step
+		// is neglected, then the next time this.displayLives() is called, the remaining ball icons will
+		// be drawn starting from the left of the most recently drawn ball icon. The remaining ball icons
+		// should always be drawn starting from the far right of the panel.
+		this.xPosBall = this.width - ball.size - 1;
 	},
 
 	clear: function() {
@@ -295,3 +301,21 @@ window.addEventListener("keydown", game.startListener);
 
 // inside some init function
 canvas2.displayLives();
+
+
+
+// TEST FUNCTION FOR LIVES PANEL
+window.addEventListener("keydown", function(e) {
+	if (e.code === "KeyJ") {
+		game.lives -= 1;
+		canvas2.xPosBall = this.width - ball.size - 1
+		canvas2.clear();
+		canvas2.displayLives();
+	}
+	if (e.code === "KeyL") {
+		game.lives += 1;
+		canvas2.xPosBall = this.width - ball.size - 1;
+		canvas2.clear();
+		canvas2.displayLives();
+	}
+});
