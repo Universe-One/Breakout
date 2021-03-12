@@ -78,7 +78,7 @@ const game = {
 	// When the paddle and ball are in the desired position, the player may start the game
 	// by pressing the Space button, which will send the ball bouncing.
 	preStart: true,
-	lives: 3, // 5 is the maximum number of lives that a player can accumulate.
+	lives: 2, // 5 is the maximum number of lives that a player can accumulate.
 	startListener: function(e) {
 		if (e.code === "Space") {
 			game.start();
@@ -109,6 +109,12 @@ const game = {
 		// generally match the display refresh rate in most web browsers.
 		window.requestAnimationFrame(game.loop);
 	},
+	gameOver: function() {
+		// When the game ends, move the ball up one pixel from the death plane so it doesn't continue
+		// to trigger the collision detection code.
+		ball.yPos -= ball.size + 1;
+		console.log("Game Over!");
+	}
 }
 
 const paddle = {
@@ -207,20 +213,31 @@ const ball = {
 
 		// Maybe explain reason why this is better than detecting collision with the actual bottom of the screen.
 		// Also, tweak value.
-		} else if (this.yPos >= canvas.height + 100 && !game.preStart) {
-			console.log("Dead");
+
+		} else if (this.yPos >= canvas.height + 100 - this.size && !game.preStart) {
+			
 			
 			// Refactor the following into RESET HANDLER FUNCTION
+
+			// Make the ball stop moving
+			ball.xVel = 0;
+			ball.yVel = 0;
+			// Lose a life
 			game.lives -= 1;
 			canvas2.clear();
 			canvas2.displayLives();
-			// Spawn a new ball on top of the center of the paddle.
-			ball.xPos = paddle.xPos + paddle.width / 2;
-			ball.yPos = canvas.height - (paddle.height * 2) - this.size;
-			ball.xVel = 0;
-			ball.yVel = 0;
-			game.preStart = true;
-			window.addEventListener("keydown", game.startListener);
+			// After losing a life, if the player has at least one life remaining, reset the ball to the top of the 
+			// center of the paddle, and let the player launch it again.
+			if (game.lives >= 1) {
+				ball.xPos = paddle.xPos + paddle.width / 2;
+				ball.yPos = canvas.height - (paddle.height * 2) - this.size;
+				
+				game.preStart = true;
+				window.addEventListener("keydown", game.startListener);
+			} else {
+				// Handle end-of-game operations
+				game.gameOver();
+			}
 		}
 	}
 }
@@ -307,15 +324,17 @@ canvas2.displayLives();
 // TEST FUNCTION FOR LIVES PANEL
 window.addEventListener("keydown", function(e) {
 	if (e.code === "KeyJ") {
-		game.lives -= 1;
-		canvas2.xPosBall = this.width - ball.size - 1
-		canvas2.clear();
-		canvas2.displayLives();
+		if (game.lives > 0) {
+			game.lives -= 1;
+			canvas2.clear();
+			canvas2.displayLives();
+		}
 	}
 	if (e.code === "KeyL") {
-		game.lives += 1;
-		canvas2.xPosBall = this.width - ball.size - 1;
-		canvas2.clear();
-		canvas2.displayLives();
+		if (game.lives < 5) {
+			game.lives += 1;
+			canvas2.clear();
+			canvas2.displayLives();
+		}
 	}
 });
