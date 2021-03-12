@@ -1,8 +1,9 @@
 // TODO
 
-// Color of brick = how many more times it has to be hit to break. Darker bricks require more hits to break
-// ball not moving with paddle in preStart state in LIVE DEMO
-
+// look for more appealing hues of bricks
+// 
+// Redundant comments occur over every instance of a design pattern. Rewrite these comments to appear once ath
+// the beginning of the program or only the first time a design pattern occurs.
 
 // The element references have "Elem" suffixes to differentiate them from variables used in the program.
 const canvasElem = document.querySelector("#game-canvas");
@@ -19,11 +20,44 @@ const canvas = {
 	height: canvasElem.height,
 	clear: function() {
 		ctx.clearRect(0, 0, this.width, this.height);
+	}
+}
+
+// Display panel that shows lives remaining.
+const canvas2 = {
+	width: canvasElem2.width,
+	height: canvasElem2.height,
+	// getter function is used so that the ball icon's x position can be assigned in relation to the 
+	// width of canvas2 using the this keyword. An extra 1 pixel offset is subtracted to maintain the 
+	// roundness of the right part of the ball icon.
+	get xPosBall() {
+		return this._xPosBall || this.width - ball.size - 1;
 	},
+	// Since xPosBall is accessed with a getter function, a setter is necessary to change its value.
+	set xPosBall(value) {
+		this._xPosBall = value;
+	},
+	// Vertically center ball icons. A getter is used so the ball's y position can be assigned in relation to
+	// the height of canvas2 using the this keyword.
+	get yPosBall() {
+		return this.height / 2;
+	},
+	displayLives: function() {
+		// The lives display panel will show ball icons based on how many lives the player has left.
+		// It will display one fewer ball than the player has lives because the current ball in play
+		// represents one life.
+		for (i = 0; i < game.lives - 1; i++) {
+			this.drawBallIcon();
+			this.xPosBall -= 25;
+		}
+	},
+
+	// Draw an icon that visually matches the ball. These icons are used to represent lives remaining.
 	drawBallIcon: function() {
 		ctx2.fillStyle = ball.color;
 		ctx2.beginPath();
-		ctx2.arc(0, 0, 10, 0, 2 * Math.PI);
+		
+		ctx2.arc(this.xPosBall, this.yPosBall, ball.size, 0, 2 * Math.PI);
 		ctx2.fill();
 	}
 }
@@ -34,7 +68,7 @@ const game = {
 	// When the paddle and ball are in the desired position, the player may start the game
 	// by pressing the Space button, which will send the ball bouncing.
 	preStart: true,
-	lives: 5, // Change this value to 3 before production
+	lives: 3, // 5 is the maximum number of lives that a player can accumulate.
 	startListener: function(e) {
 		if (e.code === "Space") {
 			game.start();
@@ -65,15 +99,6 @@ const game = {
 		// generally match the display refresh rate in most web browsers.
 		window.requestAnimationFrame(game.loop);
 	},
-
-	displayLives: function() {
-		// The lives display panel will show ball icons based on how many lives the player has left.
-		// It will display one fewer ball than the player has lives because the current ball in play
-		// represents one life.
-		for (i = 0; i < this.lives - 1; i++) {
-			canvas.drawBallIcon();
-		}
-	}
 }
 
 const paddle = {
@@ -251,4 +276,4 @@ window.requestAnimationFrame(game.loop);
 // the game is reset, and a new game begins.
 window.addEventListener("keydown", game.startListener);
 
-canvas.drawBallIcon();
+canvas2.displayLives();

@@ -15,7 +15,16 @@
       <canvas id="game-canvas" width="400" height="400">
         <p>Breakout is a popular game involving a user-controlled paddle, a bouncing ball, and many breakable bricks. The object of the game is to achieve the highest possible score by completing all the levels, and each level is completed by breaking all of the bricks in it. A brick breaks when the bouncing ball hits it a sufficient number of times which depends on the brick's color. Darker bricks require more hits to break. If the ball ever touches the bottom of the screen, a life is lost and the ball is reset. If all lives are lost, the game is over. Bricks are located at the top of the screen, and the paddle rests just above the bottom of the screen. The purpose of the paddle is to guide the ball toward the remaining bricks in the level while preventing the ball from touching the bottom of the screen. The user controls this paddle by moving it left and right in an effort to meet the ball in time. Unfortunately, your browser does not support canvas, which is needed in order for this game to run.</p>
       </canvas>
-      <canvas id="lives-canvas" width="140" height="40">
+      <!-- The width of the lives-canvas is 93 for the following reason:
+        * The maximum number of extra balls that can be shown in the lives panel is 4. 
+        * The radius of each ball is 8 pixels.
+        * The distance from the center of each ball to the center of its adjacent ball(s) is 25 pixels.
+        * Therefore, the distance from the center of the rightmost ball and the center of the leftmost ball is 75 pixels.
+        * The distance from the rightmost ball to the right edge of the panel and correspondingly the distance from
+            the leftmost ball to the left edge of the panel is the radius of the ball (8 pixels) +/- a 1 pixel offset which
+            is necessary to keep the balls looking round. (8 + 1) * 2 = 18
+        * 75 + 18 = 93 -->
+      <canvas id="lives-canvas" width="93" height="40">
         <p>A live-updated panel displaying how many balls (lives) the player has left.</p>
       </canvas>
     </div>

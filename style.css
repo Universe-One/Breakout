@@ -42,10 +42,10 @@
 }
 
 #lives-canvas {
-	background-color: #FFFFFF;
+	background-color: #DDDDDD;
 	position: absolute;
 	top: 440px;
 	bottom: 0;
-	left: 300px;
+	left: 347px;
 	right: 0;
 }
