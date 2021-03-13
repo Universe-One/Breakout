@@ -6,13 +6,13 @@
 // the beginning of the program or only the first time a design pattern occurs.
 // Confine lives from 0/1-5 and update lives panel to reflect that
 
+
+import canvas2 from "./canvas2.js";
+
 // The element references have "Elem" suffixes to differentiate them from variables used in the program.
 const canvasElem = document.querySelector("#game-canvas");
 const ctx = canvasElem.getContext("2d");
-// canvas variables suffixed with a 2 are related to the display on the bottom right corner of the
-// canvas container showing how many balls (lives) the player has left.
-const canvasElem2 = document.querySelector("#lives-canvas");
-const ctx2 = canvasElem2.getContext("2d");
+
 const scoreElem = document.querySelector("#current-score");
 const highScoreElem = document.querySelector("#high-score");
 
@@ -31,54 +31,6 @@ const canvas = {
 	}
 }
 
-// Display panel that shows lives remaining.
-const canvas2 = {
-	width: canvasElem2.width,
-	height: canvasElem2.height,
-	// getter function is used so that the ball icon's x position can be assigned in relation to the 
-	// width of canvas2 using the this keyword. An extra 1 pixel offset is subtracted to maintain the 
-	// roundness of the right part of the ball icon.
-	get xPosBall() {
-		return this._xPosBall || this.width - ball.size - 1;
-	},
-	// Since xPosBall is accessed with a getter function, a setter is necessary to change its value.
-	set xPosBall(value) {
-		this._xPosBall = value;
-	},
-	// Vertically center ball icons. A getter is used so the ball's y position can be assigned in relation to
-	// the height of canvas2 using the this keyword.
-	get yPosBall() {
-		return this.height / 2;
-	},
-	displayLives: function() {
-		// The lives display panel will show ball icons based on how many lives the player has left.
-		// It will display one fewer ball than the player has lives because the current ball in play
-		// represents one life.
-		for (i = 0; i < game.lives - 1; i++) {
-			this.drawBallIcon();
-			this.xPosBall -= 25;
-		}
-		// Reset this.xPosBall's value to the initial position at the right of the panel. If this step
-		// is neglected, then the next time this.displayLives() is called, the remaining ball icons will
-		// be drawn starting from the left of the most recently drawn ball icon. The remaining ball icons
-		// should always be drawn starting from the far right of the panel.
-		this.xPosBall = this.width - ball.size - 1;
-	},
-
-	clear: function() {
-		ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-	},
-
-	// Draw an icon that visually matches the ball. These icons are used to represent lives remaining.
-	drawBallIcon: function() {
-		ctx2.fillStyle = ball.color;
-		ctx2.beginPath();
-		
-		ctx2.arc(this.xPosBall, this.yPosBall, ball.size, 0, 2 * Math.PI);
-		ctx2.fill();
-	}
-}
-
 const game = {
 	// preStart is true when the game first loads, a life is lost, or when the game is reset.
 	// In this state, the player will be able to move the paddle with the ball on it.
@@ -86,7 +38,15 @@ const game = {
 	// by pressing the Space button, which will send the ball bouncing.
 	preStart: true,
 	isOver: false,
-	lives: 2, // 5 is the maximum number of lives that a player can accumulate.
+	lives: 3,  // 5 is the maximum number of lives that a player can accumulate.
+
+
+
+	// When the player completes a level, gain a life unless already at the maximum
+	level: 1,
+
+
+
 	requestId: null,
 	startListener: function(e) {
 		if (e.code === "Space") {
@@ -164,7 +124,7 @@ const game = {
 		game.isOver = false;
 		game.preStart = true;
 		// CHANGE TO 3 LIVES LATER
-		game.lives = 2;
+		game.lives = 3;
 		canvas2.displayLives();
 		paddle.xPos = (canvas.width / 2) - (paddle.width / 2);
 		ball.xPos = paddle.xPos + paddle.width / 2;
@@ -246,7 +206,7 @@ const ball = {
 	xVel: 0,
 	yVel: 0,
 	size: 8,
-	speed: 8,
+	speed: 3,
 	color: "rgb(0, 0, 255)",
 	draw: function() {
 		ctx.fillStyle = this.color;
@@ -263,7 +223,9 @@ const ball = {
 	// Possibly refactor into switch statement
 	detectCollision: function() {
 		//BUG IF THE SIDE OF THE PADDLE IS HIT, BALL ZIGZAGS because of the line (this.yVel = -(this.yVel);).
-		// Fix this
+		// the probable fix is to check where on the paddle the ball hits before affecting the ball's velocity
+		// Figuring out how to manipulate velocity based on incoming velocity and where the ball hits will
+		// also be useful for brick collision detection
 
 		// ADJUST VALUES TO MAKE A HITBOX THAT MAKES SENSE (ACTUAL HITBOX SHOULD BE A BIT SMALLER THAN VISUAL PADDLE)
 		// ONE REASON IS THAT IF IT ISN'T, BALL WILL COUNT AS COLLIDING WITH PADDLE DURING PRESTART
@@ -406,11 +368,21 @@ window.addEventListener("keydown", function(e) {
 			canvas2.displayLives();
 		}
 	}
+
+	// Next Level
 	if (e.code === "KeyL") {
-		if (game.lives < 5) {
-			game.lives += 1;
-			canvas2.clear();
-			canvas2.displayLives();
+		if (game.level < 5) {
+			game.level += 1;
+			console.log(game.level);
+			if (game.lives < 5) {
+				game.lives += 1;
+				console.log("Gain life");
+				canvas2.clear();
+				canvas2.displayLives();
+			}
 		}
 	}
 });
+
+
+export { game, ball };
