@@ -163,6 +163,7 @@ const game = {
 
 		game.isOver = false;
 		game.preStart = true;
+		// CHANGE TO 3 LIVES LATER
 		game.lives = 2;
 		canvas2.displayLives();
 		paddle.xPos = (canvas.width / 2) - (paddle.width / 2);
@@ -245,7 +246,7 @@ const ball = {
 	xVel: 0,
 	yVel: 0,
 	size: 8,
-	speed: 10,
+	speed: 8,
 	color: "rgb(0, 0, 255)",
 	draw: function() {
 		ctx.fillStyle = this.color;
@@ -259,7 +260,21 @@ const ball = {
 		ctx.arc(this.xPos += this.xVel, this.yPos -= this.yVel, this.size, 0, 2 * Math.PI);
 		this.detectCollision();
 	},
+	// Possibly refactor into switch statement
 	detectCollision: function() {
+		//BUG IF THE SIDE OF THE PADDLE IS HIT, BALL ZIGZAGS because of the line (this.yVel = -(this.yVel);).
+		// Fix this
+
+		// ADJUST VALUES TO MAKE A HITBOX THAT MAKES SENSE (ACTUAL HITBOX SHOULD BE A BIT SMALLER THAN VISUAL PADDLE)
+		// ONE REASON IS THAT IF IT ISN'T, BALL WILL COUNT AS COLLIDING WITH PADDLE DURING PRESTART
+		// Detect collision with paddle
+		if (this.xPos >= paddle.xPos - this.size + 1 && this.xPos <= paddle.xPos + paddle.width + this.size - 1 && 
+			this.yPos >= paddle.yPos - this.size + 1 && this.yPos <= paddle.yPos + paddle.height + this.size - 1) {
+			this.yVel = -(this.yVel);
+		}
+
+
+
 		// Detect collision with left and right walls
 		if (this.xPos <= 0 + this.size || this.xPos >= canvas.width - this.size) {
 			this.xVel = -(this.xVel);
@@ -267,13 +282,10 @@ const ball = {
 		// Detect collision with top wall
 		if (this.yPos <= 0 + this.size) {
 			this.yVel = -(this.yVel);
-		// Detect collision with an "imaginary" plane below the bottom of the canvas. If the ball ever collides with this plane,
-		// a life is lost and the game reenters the preStart state in which the ball sits atop the paddle waiting to be 
-		// launched again.
 
-		// Maybe explain reason why this is better than detecting collision with the actual bottom of the screen.
-		// Also, tweak value.
-
+		// Detect collision with a death plane below the bottom of the canvas. If the ball ever collides with this plane,
+		// a life is lost and if there is at least one more life remaining, the game reenters the preStart state in which 
+		// the ball sits atop the paddle waiting to be launched again. If there are no lives remaining, trigger game over.
 		} else if (this.yPos >= canvas.height + 100 - this.size && !game.preStart) {
 			
 			
