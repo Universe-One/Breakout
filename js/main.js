@@ -38,16 +38,20 @@ const game = {
 	// by pressing the Space button, which will send the ball bouncing.
 	preStart: true,
 	isOver: false,
-	lives: 3,  // 5 is the maximum number of lives that a player can accumulate.
-
-
-
-	// When the player completes a level, gain a life unless already at the maximum
-	level: 1,
-
-
-
+	lives: 3, // 5 is the maximum number of lives that a player can accumulate.
+	level: 1, // When the player completes a level, gain a life unless already at the maximum
+	score: 0,
+	highScore: 0,
 	requestId: null,
+
+	// If there is a stored high score, retrieve it. Otherwise, set high score to 0.
+	// Then, set the high score text to be whatever the high score is.
+	retrieveHighScore: function() {
+		localStorage.getItem("highScore") !== null ?
+		this.highScore = localStorage.getItem("highScore") :
+		this.highScore = 0;
+		highScoreElem.textContent = `High Score: ${this.highScore}`;
+	},
 	startListener: function(e) {
 		if (e.code === "Space") {
 			game.start();
@@ -217,6 +221,7 @@ const ball = {
 		ctx.fill();
 	},
 	move: function() {
+
 		ctx.arc(this.xPos += this.xVel, this.yPos -= this.yVel, this.size, 0, 2 * Math.PI);
 		this.detectCollision();
 	},
@@ -232,7 +237,11 @@ const ball = {
 		// Detect collision with paddle
 		if (this.xPos >= paddle.xPos - this.size + 1 && this.xPos <= paddle.xPos + paddle.width + this.size - 1 && 
 			this.yPos >= paddle.yPos - this.size + 1 && this.yPos <= paddle.yPos + paddle.height + this.size - 1) {
-			this.yVel = -(this.yVel);
+
+			if (this.yVel <= 0) {
+				this.yVel = -(this.yVel);
+			}
+
 		}
 
 
@@ -355,6 +364,7 @@ window.requestAnimationFrame(game.loop);
 window.addEventListener("keydown", game.startListener);
 
 // inside some init function
+game.retrieveHighScore();
 canvas2.displayLives();
 
 
@@ -382,7 +392,23 @@ window.addEventListener("keydown", function(e) {
 			}
 		}
 	}
+
+	// Score tester
+	if (e.code === "KeyP") {
+		game.score += 5;
+		if (game.highScore < game.score) {
+			game.highScore = game.score;
+
+			localStorage.setItem("highScore", game.highScore);
+		}
+		// Update score and high score text with current values
+			scoreElem.textContent = `Score: ${game.score}`;
+			highScoreElem.textContent = `High Score: ${game.highScore}`;
+	}
 });
+
+
+
 
 
 export { game, ball };

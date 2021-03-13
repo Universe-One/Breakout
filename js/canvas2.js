@@ -1,3 +1,4 @@
+// Update imports once other objects have been turned into their own modules
 import { game, ball } from "./main.js";
 
 
