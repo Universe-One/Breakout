@@ -67,6 +67,7 @@ const game = {
 	// the opportunity to reset the game and play again.
 	start: function() {
 		this.preStart = false;
+		this.firstPreStart = false;
 		window.removeEventListener("keydown", game.startListener);
 
 		// EXTREMELY SIMPLE IMPLEMENTATION OF BALL MOVEMENT
@@ -99,25 +100,29 @@ const game = {
 		ball.move();
 		ball.draw();
 
-		// Show keyboard control screen
-		ctx.fillStyle = "#CCCCCC";
-		ctx.fillRect(100, 200, 200, 120);
-
-		canvas.drawText("Space", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 20, "start");
-		canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2 - 15, canvas.height / 2 + 20);
-		canvas.drawText("launch ball", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 21, "end");
-
-		canvas.drawText("A /", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 48, "start");
-		canvas.drawText("D /", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 76, "start");
+		if (game.firstPreStart) {
+			// Show keyboard control screen
+			ctx.fillStyle = "#CCCCCC";
+			ctx.fillRect(100, 200, 200, 120);
 
 
-		// MOVE THIS TO canvas object
-		/*ctx.fillStyle = "000000";
-		ctx.beginPath();
-		ctx.moveTo();*/
+			// Work on text alignment/justification!!!
 
+			canvas.drawText("Space", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 20, "start");
+			canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2 - 15, canvas.height / 2 + 20);
+			canvas.drawText("launch ball", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 21, "end");
 
+			canvas.drawText("A", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 48, "start");
+			//canvas.drawText("/", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 48, "start");
+			canvas.drawText("move left", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 48, "end");
+			// DRAW ARROW ICON HERE
 
+			canvas.drawText("D", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 76, "start");
+			//canvas.drawText("D", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 76, "start");
+			canvas.drawText("move right", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 76, "end");
+			// DRAW ARROW ICON HERE
+		}
+		
 
 
 
