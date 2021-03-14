@@ -23,13 +23,16 @@ const canvas = {
 	clear: function() {
 		ctx.clearRect(0, 0, this.width, this.height);
 	},
-	drawText: function(text, font, color, xPos, yPos) {
+	drawText: function(text, font, color, xPos, yPos, textAlign = "center") {
 		ctx.fillStyle = color;
-		ctx.textAlign = "center";
+		ctx.textAlign = textAlign;
 		ctx.textBaseline = "middle";
 		ctx.font = font;
 		ctx.fillText(text, xPos, yPos);
-	}
+	},
+	/*drawArrowIcon: function(direction, xPos, yPos) {
+
+	}*/
 }
 
 const game = {
@@ -38,6 +41,7 @@ const game = {
 	// When the paddle and ball are in the desired position, the player may start the game
 	// by pressing the Space button, which will send the ball bouncing.
 	preStart: true,
+	firstPreStart: true, // Used to determine if the keyboard control screen should be displayed.
 	isOver: false,
 	lives: 3, // 5 is the maximum number of lives that a player can accumulate.
 	level: 1, // When the player completes a level, gain a life unless already at the maximum
@@ -75,6 +79,7 @@ const game = {
 	// window.requestAnimationFrame().
 	loop: function() {
 		canvas.clear();
+
 		paddle.handleMovement();
 		paddle.draw();
 
@@ -93,6 +98,35 @@ const game = {
 
 		ball.move();
 		ball.draw();
+
+		// Show keyboard control screen
+		ctx.fillStyle = "#CCCCCC";
+		ctx.fillRect(100, 200, 200, 120);
+
+		canvas.drawText("Space", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 20, "start");
+		canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2 - 15, canvas.height / 2 + 20);
+		canvas.drawText("launch ball", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 21, "end");
+
+		canvas.drawText("A /", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 48, "start");
+		canvas.drawText("D /", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 76, "start");
+
+
+		// MOVE THIS TO canvas object
+		/*ctx.fillStyle = "000000";
+		ctx.beginPath();
+		ctx.moveTo();*/
+
+
+
+
+
+
+
+
+
+
+
+
 
 		// Establish the game loop. window.requestAnimationFrame runs its callback function before
 		// the browser performs the next repaint. This often happens 60 times per second, but will
@@ -211,7 +245,7 @@ const paddle = {
 }
 
 const ball = {
-	xPos: paddle.xPos + paddle.width / 2 - 40 - 8,
+	xPos: paddle.xPos + paddle.width / 2,
 	// Getter method is used for ball's yPos since its initial position is related to its size, and
 	// the size needs to be referred to with the this keyword.
 	get yPos() {
@@ -219,7 +253,7 @@ const ball = {
 		// this._yPos equals 0. If the OR operator is used, the left operand evaluates to false,
 		// resetting the y position of the ball to the bottom of the screen. This is not the
 		// intended behavior.
-		return this._yPos ?? canvas.height - (paddle.height * 2) - this.size + 32;
+		return this._yPos ?? canvas.height - (paddle.height * 2) - this.size;
 	},
 	// Since yPos is accessed with a getter method, a setter method is necessary to change its value
 	set yPos(value) {
@@ -228,7 +262,7 @@ const ball = {
 	xVel: 0,
 	yVel: 0,
 	size: 8, // Used as radius of ball
-	speed: 3,
+	speed: 10,
 	color: "rgb(0, 0, 255)",
 	draw: function() {
 		ctx.fillStyle = this.color;
