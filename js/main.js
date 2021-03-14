@@ -15,6 +15,7 @@ const ctx = canvasElem.getContext("2d");
 
 const scoreElem = document.querySelector("#current-score");
 const highScoreElem = document.querySelector("#high-score");
+const levelElem = document.querySelector("#level");
 
 const canvas = {
 	width: canvasElem.width,
@@ -125,16 +126,19 @@ const game = {
 
 		// Possibly refactor the following into an init-type function
 
-		game.isOver = false;
-		game.preStart = true;
-		// CHANGE TO 3 LIVES LATER
-		game.lives = 3;
+		this.isOver = false;
+		this.preStart = true;
+		this.level = 1;
+		level.textContent = `Level ${this.level}`;
+		this.score = 0;
+		scoreElem.textContent = `Score: ${this.score}`;
+		this.lives = 3;
 		canvas2.displayLives();
 		paddle.xPos = (canvas.width / 2) - (paddle.width / 2);
 		ball.xPos = paddle.xPos + paddle.width / 2;
 		ball.yPos = canvas.height - (paddle.height * 2) - ball.size;
 
-		window.addEventListener("keydown", game.startListener);
+		window.addEventListener("keydown", this.startListener);
 		
 		game.requestId = window.requestAnimationFrame(game.loop);
 	}
@@ -210,7 +214,7 @@ const ball = {
 	xVel: 0,
 	yVel: 0,
 	size: 8, // Used as radius of ball
-	speed: 3,
+	speed: 10,
 	color: "rgb(0, 0, 255)",
 	draw: function() {
 		ctx.fillStyle = this.color;
@@ -239,6 +243,7 @@ const ball = {
 			this.yPos >= paddle.yPos - this.size && this.yPos <= paddle.yPos + paddle.height + this.size) {
 
 
+			//------------------------------------------------------------------------------
 			// Center of the paddle
 			//console.log(paddle.xPos + paddle.width / 2, paddle.yPos + paddle.height / 2);
 
@@ -246,9 +251,32 @@ const ball = {
 			//console.log(this.xPos, this.yPos);
 
 
-			console.log(Math.abs(this.xPos - (paddle.xPos + paddle.width / 2))); 
-			console.log(Math.abs(this.yPos - (paddle.yPos + paddle.height / 2)));
+			// Distance between center of ball and center of paddle
+			/*console.log(Math.abs(this.xPos - (paddle.xPos + paddle.width / 2))); 
+			console.log(Math.abs(this.yPos - (paddle.yPos + paddle.height / 2)));*/
 
+
+			// If the x distance between the center of the ball and the center of the paddle is
+			// less than or equal to the ball's radius plus half the rectangle's width
+			// and the y distance between the center of the ball and the center of the paddle is
+			// less than or equal to the ball's radius plus half the rectangle's height
+			/*if (Math.abs(this.xPos - (paddle.xPos + paddle.width / 2)) <= this.size + paddle.width / 2 &&
+				Math.abs(this.yPos - (paddle.yPos + paddle.height / 2)) <= this.size + paddle.height / 2) {
+				//console.log("WOO");
+			}*/
+
+			// PYTHAGOREAN THEOREM (formula a2 + b2 = c2 or square root of a2 + b2 = c)
+			// Possibly refactor to get rid of sqrt for performance
+			/*console.log(
+				Math.sqrt(
+					Math.abs(this.xPos - (paddle.xPos + paddle.width / 2)) ** 2 + 
+				    Math.abs(this.yPos - (paddle.yPos + paddle.height / 2)) ** 2
+				)
+			);*/
+			
+			// Make dist x and dist y and see if colliding?
+
+			//------------------------------------------------------------------------------
 
 
 
@@ -390,19 +418,19 @@ canvas2.displayLives();
 
 // TEST FUNCTION FOR LIVES PANEL
 window.addEventListener("keydown", function(e) {
-	if (e.code === "KeyJ") {
+	/*if (e.code === "KeyJ") {
 		if (game.lives > 0) {
 			game.lives -= 1;
 			canvas2.clear();
 			canvas2.displayLives();
 		}
-	}
+	}*/
 
-	// Next Level
+	// Next Level tester
 	if (e.code === "KeyL") {
 		if (game.level < 5) {
 			game.level += 1;
-			console.log(game.level);
+			levelElem.textContent = `Level ${game.level}`;
 			if (game.lives < 5) {
 				game.lives += 1;
 				console.log("Gain life");
@@ -425,9 +453,6 @@ window.addEventListener("keydown", function(e) {
 			highScoreElem.textContent = `High Score: ${game.highScore}`;
 	}
 });
-
-
-
 
 
 export { game, ball };
