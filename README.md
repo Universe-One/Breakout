@@ -3,3 +3,19 @@
 
 ## Play
 [Live Demo](https://universe-one.github.io/Breakout/)
+
+## Controls
+A or &#8592; - Move Left  
+D or &#8594; - Move Right  
+Space (when ball rests atop paddle) - Launch Ball  
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;(when game is over) - Restart Game
+
+## Technologies Used
+* HTML5
+* CSS3
+* JavaScript
+* Canvas API
+* Web Storage API
+
+## License
+Licensed under the [MIT License](LICENSE)

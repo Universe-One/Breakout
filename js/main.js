@@ -30,9 +30,9 @@ const canvas = {
 		ctx.font = font;
 		ctx.fillText(text, xPos, yPos);
 	},
-	/*drawArrowIcon: function(direction, xPos, yPos) {
-
-	}*/
+	drawArrowIcon: function(direction, xPos, yPos) {
+		
+	}
 }
 
 const game = {
