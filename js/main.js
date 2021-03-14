@@ -193,7 +193,7 @@ const paddle = {
 }
 
 const ball = {
-	xPos: paddle.xPos + paddle.width / 2,
+	xPos: paddle.xPos + paddle.width / 2 - 40 - 8,
 	// Getter method is used for ball's yPos since its initial position is related to its size, and
 	// the size needs to be referred to with the this keyword.
 	get yPos() {
@@ -201,7 +201,7 @@ const ball = {
 		// this._yPos equals 0. If the OR operator is used, the left operand evaluates to false,
 		// resetting the y position of the ball to the bottom of the screen. This is not the
 		// intended behavior.
-		return this._yPos ?? canvas.height - (paddle.height * 2) - this.size;
+		return this._yPos ?? canvas.height - (paddle.height * 2) - this.size + 32;
 	},
 	// Since yPos is accessed with a getter method, a setter method is necessary to change its value
 	set yPos(value) {
@@ -209,7 +209,7 @@ const ball = {
 	},
 	xVel: 0,
 	yVel: 0,
-	size: 8,
+	size: 8, // Used as radius of ball
 	speed: 3,
 	color: "rgb(0, 0, 255)",
 	draw: function() {
@@ -235,9 +235,28 @@ const ball = {
 		// ADJUST VALUES TO MAKE A HITBOX THAT MAKES SENSE (ACTUAL HITBOX SHOULD BE A BIT SMALLER THAN VISUAL PADDLE)
 		// ONE REASON IS THAT IF IT ISN'T, BALL WILL COUNT AS COLLIDING WITH PADDLE DURING PRESTART
 		// Detect collision with paddle
-		if (this.xPos >= paddle.xPos - this.size + 1 && this.xPos <= paddle.xPos + paddle.width + this.size - 1 && 
-			this.yPos >= paddle.yPos - this.size + 1 && this.yPos <= paddle.yPos + paddle.height + this.size - 1) {
+		if (this.xPos >= paddle.xPos - this.size && this.xPos <= paddle.xPos + paddle.width + this.size && 
+			this.yPos >= paddle.yPos - this.size && this.yPos <= paddle.yPos + paddle.height + this.size) {
 
+
+			// Center of the paddle
+			//console.log(paddle.xPos + paddle.width / 2, paddle.yPos + paddle.height / 2);
+
+			// Center of the ball
+			//console.log(this.xPos, this.yPos);
+
+
+			console.log(Math.abs(this.xPos - (paddle.xPos + paddle.width / 2))); 
+			console.log(Math.abs(this.yPos - (paddle.yPos + paddle.height / 2)));
+
+
+
+
+
+
+
+			// NEGATIVE 7 to 87 --------
+			//console.log(this.xPos - paddle.xPos);
 			if (this.yVel <= 0) {
 				this.yVel = -(this.yVel);
 			}
@@ -263,8 +282,8 @@ const ball = {
 			// Refactor the following into RESET HANDLER FUNCTION
 
 			// Make the ball stop moving
-			ball.xVel = 0;
-			ball.yVel = 0;
+			this.xVel = 0;
+			this.yVel = 0;
 			// Lose a life
 			game.lives -= 1;
 			canvas2.clear();
@@ -272,8 +291,8 @@ const ball = {
 			// After losing a life, if the player has at least one life remaining, reset the ball to the top of the 
 			// center of the paddle, and let the player launch it again.
 			if (game.lives >= 1) {
-				ball.xPos = paddle.xPos + paddle.width / 2;
-				ball.yPos = canvas.height - (paddle.height * 2) - this.size;
+				this.xPos = paddle.xPos + paddle.width / 2;
+				this.yPos = canvas.height - (paddle.height * 2) - this.size;
 				
 				// game.preStart is used to determine if a ball should rest atop the paddle. When a life is lost and at least
 				// 1 life remains, then this should happen. If the final life is lost, a ball should not be placed atop the paddle
