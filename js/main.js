@@ -77,6 +77,20 @@ const game = {
 		canvas.clear();
 		paddle.handleMovement();
 		paddle.draw();
+
+
+
+
+		// BRICK STUFF
+		drawBrickRow(10);
+		drawBrickRow(30);
+		drawBrickRow(50);
+		drawBrickRow(70);
+		drawBrickRow(90);
+		drawBrickRow(110);
+
+
+
 		ball.move();
 		ball.draw();
 
@@ -214,7 +228,7 @@ const ball = {
 	xVel: 0,
 	yVel: 0,
 	size: 8, // Used as radius of ball
-	speed: 10,
+	speed: 3,
 	color: "rgb(0, 0, 255)",
 	draw: function() {
 		ctx.fillStyle = this.color;
@@ -336,9 +350,9 @@ const ball = {
 }
 
 const Brick = function(xPos, yPos, hitsLeft) {
-	this.xPos = null;
-	this.yPos = null;
-	this.width = 60;
+	this.xPos = xPos;
+	this.yPos = yPos;
+	this.width = 55;
 	this.height = 10;
 	this.hitsLeft = hitsLeft;
 	// The shade of the brick signifies how many hits are required to break it. Darker bricks require more 
@@ -354,8 +368,6 @@ const Brick = function(xPos, yPos, hitsLeft) {
 			this.color = "rgb(0, 128, 0)";
 			break;
 	}
-
-	this.draw();
 }
 
 Brick.prototype.draw = function() {
@@ -363,9 +375,25 @@ Brick.prototype.draw = function() {
 	ctx.fillRect(this.xPos, this.yPos, this.width, this.height);
 };
 
-/*for (let i = 0; i < 5; i++) {
-	const brick = new Brick(this.width + i, 100, 2);
-}*/
+// 55 * 6 = 330
+// 70 remaining spaced out 10 each
+// TEST FUNCTION
+function drawBrickRow(yPos) {
+	let brick1 = new Brick(0 + 10, yPos, 1);
+	brick1.draw();
+	let brick2 = new Brick(55 + 10 + 10, yPos, 2);
+	brick2.draw();
+	let brick3 = new Brick(110 + 10 + 20, yPos, 3);
+	brick3.draw();
+	let brick4 = new Brick(165 + 10 + 30, yPos, 1);
+	brick4.draw();
+	let brick5 = new Brick(220 + 10 + 40, yPos, 2);
+	brick5.draw();
+	let brick6 = new Brick(275 + 10 + 50, yPos, 3);
+	brick6.draw();
+}
+
+
 
 // Keyboard controls
 // The keydown event fires when a key is first pressed, and then after a delay, continuously fires if the key 
