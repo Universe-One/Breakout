@@ -359,10 +359,10 @@ const Brick = function(xPos, yPos, hitsLeft) {
 	// hits to break.
 	switch (this.hitsLeft) {
 		case 1:
-			this.color = "rgb(0, 255, 0)";
+			this.color = "rgb(128, 224, 128)";
 			break;
 		case 2:
-			this.color = "rgb(0, 192, 0)";
+			this.color = "rgb(32, 192, 32)";
 			break;
 		case 3:
 			this.color = "rgb(0, 128, 0)";
@@ -381,15 +381,15 @@ Brick.prototype.draw = function() {
 function drawBrickRow(yPos) {
 	let brick1 = new Brick(0 + 10, yPos, 1);
 	brick1.draw();
-	let brick2 = new Brick(55 + 10 + 10, yPos, 2);
+	let brick2 = new Brick(55 + 10 + 10, yPos, 1);
 	brick2.draw();
-	let brick3 = new Brick(110 + 10 + 20, yPos, 3);
+	let brick3 = new Brick(110 + 10 + 20, yPos, 1);
 	brick3.draw();
 	let brick4 = new Brick(165 + 10 + 30, yPos, 1);
 	brick4.draw();
-	let brick5 = new Brick(220 + 10 + 40, yPos, 2);
+	let brick5 = new Brick(220 + 10 + 40, yPos, 1);
 	brick5.draw();
-	let brick6 = new Brick(275 + 10 + 50, yPos, 3);
+	let brick6 = new Brick(275 + 10 + 50, yPos, 1);
 	brick6.draw();
 }
 
