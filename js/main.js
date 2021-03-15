@@ -133,45 +133,30 @@ const game = {
 		ball.move();
 		ball.draw();
 
+		// game.firstPreStart is only true when the game first loads, before the player has pressed Space to launch the ball.
+		// After the ball is launched, the keyboard control screen no longer needs to be displayed, as the controls
+		// will be familiar to the player. It will not be displayed when the player restarts a game. To see the controls again,
+		// the page must be reloaded.
 		if (game.firstPreStart) {
 			// Show keyboard control screen
 			ctx.fillStyle = "#CCCCCC";
-			ctx.fillRect(100, 200, 200, 120);
+			ctx.fillRect(90, 187, 220, 113);
 
+			canvas.drawText("Space", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 17, "start");
+			canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2 - 15, canvas.height / 2 + 17);
+			canvas.drawText("launch ball", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 18, "end");
 
-			// Work on text alignment/justification!!! ADJUST DASH AND SLASH VALUES
+			canvas.drawText("A /", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 45, "start");
+			canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2 - 4, canvas.height / 2 + 45);
+			canvas.drawText("move left", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 45, "end");
+			canvas.drawArrowIcon("left", canvas.width / 2 - 29, canvas.height / 2 + 45);
 
-			canvas.drawText("Space", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 20, "start");
-			canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2 - 15, canvas.height / 2 + 20);
-			canvas.drawText("launch ball", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 21, "end");
-
-			canvas.drawText("A", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 48, "start");
-			canvas.drawText("/", "1.8em monospace", "#000000", canvas.width / 2 - 30, canvas.height / 2 + 48);
-			canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2, canvas.height / 2 + 48);
-			canvas.drawText("move left", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 48, "end");
-			
-			canvas.drawArrowIcon("left", 100, 300);
-
-
-
-			canvas.drawText("D", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 76, "start");
-			canvas.drawText("/", "1.8em monospace", "#000000", canvas.width / 2 - 30, canvas.height / 2 + 76);
-			canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2 - 5, canvas.height / 2 + 76);
-			canvas.drawText("move right", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 76, "end");
-			
-			canvas.drawArrowIcon("right", 200, 300);
+			canvas.drawText("D /", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 73, "start");
+			canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2 - 7, canvas.height / 2 + 73);
+			canvas.drawText("move right", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 73, "end");
+			canvas.drawArrowIcon("right", canvas.width / 2 - 29, canvas.height / 2 + 73);
 		}
 		
-
-
-
-
-
-
-
-
-
-
 		// Establish the game loop. window.requestAnimationFrame runs its callback function before
 		// the browser performs the next repaint. This often happens 60 times per second, but will
 		// generally match the display refresh rate in most web browsers.
