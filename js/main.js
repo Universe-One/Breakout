@@ -236,7 +236,7 @@ const ball = {
 	xVel: 0,
 	yVel: 0,
 	size: 8, // Used as radius of ball
-	speed: 10,
+	speed: 1,
 	color: "rgb(0, 0, 255)",
 	draw: function() {
 		ctx.fillStyle = this.color;
@@ -247,20 +247,31 @@ const ball = {
 		ctx.fill();
 	},
 	move: function() {
-
 		ctx.arc(this.xPos += this.xVel, this.yPos -= this.yVel, this.size, 0, 2 * Math.PI);
 		this.detectCollision();
 	},
-	// Possibly refactor into switch statement
 	detectCollision: function() {
-		//BUG IF THE SIDE OF THE PADDLE IS HIT, BALL ZIGZAGS because of the line (this.yVel = -(this.yVel);).
-		// the probable fix is to check where on the paddle the ball hits before affecting the ball's velocity
-		// Figuring out how to manipulate velocity based on incoming velocity and where the ball hits will
-		// also be useful for brick collision detection
 
-		// ADJUST VALUES TO MAKE A HITBOX THAT MAKES SENSE (ACTUAL HITBOX SHOULD BE A BIT SMALLER THAN VISUAL PADDLE)
-		// ONE REASON IS THAT IF IT ISN'T, BALL WILL COUNT AS COLLIDING WITH PADDLE DURING PRESTART
-		// Detect collision with paddle
+
+		// Checks if a circle is colliding with a rectangle. Used for ball and paddle collision detection, as well
+		// as ball and brick collision detection.
+		function circleRectCollision(circle, rect) {
+			let xDistBetweenCenters = Math.abs(circle.xPos - (rect.xPos + rect.width / 2));
+			let yDistBetweenCenters = Math.abs(circle.yPos - (rect.yPos + rect.height / 2));
+
+			if (xDistBetweenCenters > circle.size + rect.width / 2) {
+				console.log("x far");
+				return false;
+			}
+			if (yDistBetweenCenters > circle.size + rect.height / 2) {
+				console.log("y far");
+				return false;
+			}
+			
+		}
+
+		circleRectCollision(this, paddle);
+
 		if (this.xPos >= paddle.xPos - this.size && this.xPos <= paddle.xPos + paddle.width + this.size && 
 			this.yPos >= paddle.yPos - this.size && this.yPos <= paddle.yPos + paddle.height + this.size) {
 
@@ -312,6 +323,9 @@ const ball = {
 			}
 
 		}
+
+
+
 
 
 
