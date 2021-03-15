@@ -31,7 +31,40 @@ const canvas = {
 		ctx.fillText(text, xPos, yPos);
 	},
 	drawArrowIcon: function(direction, xPos, yPos) {
-		
+		let xOffsetStem = 8;
+		let yOffsetStem = 1;
+		let xOffsetHead; // Depends on direction
+		let yOffsetHead = 5;
+		let headPoint; // Depends on direction
+
+		switch (direction) {
+			// Set variables related to drawing arrow head, then draw it.
+			case "left":
+				xOffsetHead = 4;
+				headPoint = xOffsetHead - 6;
+				ctx.beginPath();
+				ctx.moveTo((xPos - xOffsetStem) + xOffsetHead, yPos - yOffsetHead);
+				ctx.lineTo((xPos - xOffsetStem) + headPoint, yPos);
+				ctx.lineTo((xPos - xOffsetStem) + xOffsetHead, yPos + yOffsetHead);
+				ctx.fill();
+				break;
+			case "right":
+				xOffsetHead = -4;
+				headPoint = xOffsetHead + 6;
+				ctx.beginPath();
+				ctx.moveTo((xPos + xOffsetStem) + xOffsetHead, yPos - yOffsetHead);
+				ctx.lineTo((xPos + xOffsetStem) + headPoint, yPos);
+				ctx.lineTo((xPos + xOffsetStem) + xOffsetHead, yPos + yOffsetHead);
+				ctx.fill();
+				break;
+		}
+		// Draw arrow stem
+		ctx.beginPath();
+		ctx.moveTo(xPos - xOffsetStem, yPos - yOffsetStem);
+		ctx.lineTo(xPos - xOffsetStem, yPos + yOffsetStem);
+		ctx.lineTo(xPos + xOffsetStem, yPos + yOffsetStem);
+		ctx.lineTo(xPos + xOffsetStem, yPos - yOffsetStem);
+		ctx.fill();
 	}
 }
 
@@ -106,21 +139,27 @@ const game = {
 			ctx.fillRect(100, 200, 200, 120);
 
 
-			// Work on text alignment/justification!!!
+			// Work on text alignment/justification!!! ADJUST DASH AND SLASH VALUES
 
 			canvas.drawText("Space", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 20, "start");
 			canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2 - 15, canvas.height / 2 + 20);
 			canvas.drawText("launch ball", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 21, "end");
 
 			canvas.drawText("A", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 48, "start");
-			//canvas.drawText("/", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 48, "start");
+			canvas.drawText("/", "1.8em monospace", "#000000", canvas.width / 2 - 30, canvas.height / 2 + 48);
+			canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2, canvas.height / 2 + 48);
 			canvas.drawText("move left", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 48, "end");
-			// DRAW ARROW ICON HERE
+			
+			canvas.drawArrowIcon("left", 100, 300);
+
+
 
 			canvas.drawText("D", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 76, "start");
-			//canvas.drawText("D", "1.8em monospace", "#000000", canvas.width / 2 - 90, canvas.height / 2 + 76, "start");
+			canvas.drawText("/", "1.8em monospace", "#000000", canvas.width / 2 - 30, canvas.height / 2 + 76);
+			canvas.drawText("-", "1.8em monospace", "#000000", canvas.width / 2 - 5, canvas.height / 2 + 76);
 			canvas.drawText("move right", "1.2em monospace", "#000000", canvas.width / 2 + 90, canvas.height / 2 + 76, "end");
-			// DRAW ARROW ICON HERE
+			
+			canvas.drawArrowIcon("right", 200, 300);
 		}
 		
 
