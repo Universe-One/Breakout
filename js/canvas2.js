@@ -1,5 +1,5 @@
 // Update imports once other objects have been turned into their own modules
-import { game, ball } from "./main.js";
+import { game, ball } from "./app.js";
 
 
 // canvas variables suffixed with a 2 are related to the display on the bottom right corner of the

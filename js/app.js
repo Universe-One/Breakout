@@ -236,7 +236,7 @@ const ball = {
 	xVel: 0,
 	yVel: 0,
 	size: 8, // Used as radius of ball
-	speed: 1,
+	speed: 10,
 	color: "rgb(0, 0, 255)",
 	draw: function() {
 		ctx.fillStyle = this.color;
