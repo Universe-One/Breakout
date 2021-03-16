@@ -277,9 +277,10 @@ const ball = {
 			// the circle and rectangle are colliding. In fact, if the circle's center is on one of this outer rectangle's
 			// corners, then the circle is definitely not colliding with the rectangle. In short, there is more work to be done
 			// because of these corner cases. There is a small area near each corner which does not lead to a collision even
-			// if the circle's radius resides in it. To fix this, and complete our modelling of the circle and original 
-			// rectangle's hitboxes, we have to round the corners of the outer, expanded rectangle.
-
+			// if the circle's center resides in it. To fix this, and complete our modelling of the circle and original 
+			// rectangle's hitboxes, we have to round the corners of the outer, expanded rectangle. This new rectangle
+			// with rounded corners will represent all of the points where the circle's center can be for there to be a 
+			// collision between the circle and the original rectangle.
 
 
 			// To solve this "corner" case...
