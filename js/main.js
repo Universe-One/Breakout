@@ -219,7 +219,7 @@ const paddle = {
 }
 
 const ball = {
-	xPos: paddle.xPos + paddle.width / 2,
+	xPos: paddle.xPos + paddle.width / 2 - 40 - 8,
 	// Getter method is used for ball's yPos since its initial position is related to its size, and
 	// the size needs to be referred to with the this keyword.
 	get yPos() {
@@ -227,7 +227,7 @@ const ball = {
 		// this._yPos equals 0. If the OR operator is used, the left operand evaluates to false,
 		// resetting the y position of the ball to the bottom of the screen. This is not the
 		// intended behavior.
-		return this._yPos ?? canvas.height - (paddle.height * 2) - this.size;
+		return this._yPos ?? canvas.height - (paddle.height * 2) - this.size + 16;
 	},
 	// Since yPos is accessed with a getter method, a setter method is necessary to change its value
 	set yPos(value) {
@@ -253,20 +253,26 @@ const ball = {
 	detectCollision: function() {
 
 
-		// Checks if a circle is colliding with a rectangle. Used for ball and paddle collision detection, as well
+		// Check if a circle is colliding with a rectangle. Used for ball and paddle collision detection, as well
 		// as ball and brick collision detection.
 		function circleRectCollision(circle, rect) {
 			let xDistBetweenCenters = Math.abs(circle.xPos - (rect.xPos + rect.width / 2));
 			let yDistBetweenCenters = Math.abs(circle.yPos - (rect.yPos + rect.height / 2));
 
+			// If the x distance between the center of the circle and the center of the rectangle is
+			// less than or equal to the circle's radius plus half the rectangle's width, there is no collision.
 			if (xDistBetweenCenters > circle.size + rect.width / 2) {
-				console.log("x far");
 				return false;
 			}
+			// If the y distance between the center of the circle and the center of the rectangle is
+			// less than or equal to the circle's radius plus half the rectangle's height, there is no collision.
 			if (yDistBetweenCenters > circle.size + rect.height / 2) {
-				console.log("y far");
 				return false;
 			}
+			// Therefore, if the function reaches this point, xDistBetweenCenters is less than or equal to the circle's 
+			// radius plus half the rectangle's width, and yDistBetweenCenters is less than or equal to the circle's
+			// radius plus half the rectangle's height. This means the circle is either touching the rectangle or 
+			// relatively close to touching it.
 			
 		}
 
