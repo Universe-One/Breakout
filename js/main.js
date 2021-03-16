@@ -251,8 +251,6 @@ const ball = {
 		this.detectCollision();
 	},
 	detectCollision: function() {
-
-
 		// Check if a circle is colliding with a rectangle. Used for ball and paddle collision detection, as well
 		// as ball and brick collision detection.
 		function circleRectCollision(circle, rect) {
@@ -272,8 +270,27 @@ const ball = {
 			// Therefore, if the function reaches this point, xDistBetweenCenters is less than or equal to the circle's 
 			// radius plus half the rectangle's width, and yDistBetweenCenters is less than or equal to the circle's
 			// radius plus half the rectangle's height. This means the circle is either touching the rectangle or 
-			// relatively close to touching it.
-			
+			// "relatively close" to touching it. The circle's center is somewhere inside (or resting on an edge or corner)
+			// of a new, expanded rectangle that surrounds the original rectangle. This new rectangle's dimensions are what
+			// would result from expanding each edge outward by the radius of the circle). However, knowing that the 
+			// circle's center lives inside (or on an edge/corner) of this new outer rectangle is not enough to determine if 
+			// the circle and rectangle are colliding. In fact, if the circle's center is on one of this outer rectangle's
+			// corners, then the circle is definitely not colliding with the rectangle. In short, there is more work to be done
+			// because of these corner cases. There is a small area near each corner which does not lead to a collision even
+			// if the circle's radius resides in it. To fix this, and complete our modelling of the circle and original 
+			// rectangle's hitboxes, we have to round the corners of the outer, expanded rectangle.
+
+
+
+			// To solve this "corner" case...
+
+			// The next step is to calculate the distance from the center of the rectangle
+			// to one of its corners, then add the radius of the circle to it. This will give us the farthest distance
+			// that the center of the circle can be from the center of the rectangle for the circle and rectangle to
+			// still be colliding. This means that any time the distance between the circle's center and the rectangle's
+			// center is less than or equal to this maximum distance, the circle and rectangle are colliding. Any time
+			// the distance between the two centers is greater than this maximum distance, the circle and rectangle
+			// are not colliding.
 		}
 
 		circleRectCollision(this, paddle);
@@ -283,26 +300,6 @@ const ball = {
 
 
 			//------------------------------------------------------------------------------
-			// Center of the paddle
-			//console.log(paddle.xPos + paddle.width / 2, paddle.yPos + paddle.height / 2);
-
-			// Center of the ball
-			//console.log(this.xPos, this.yPos);
-
-
-			// Distance between center of ball and center of paddle
-			/*console.log(Math.abs(this.xPos - (paddle.xPos + paddle.width / 2))); 
-			console.log(Math.abs(this.yPos - (paddle.yPos + paddle.height / 2)));*/
-
-
-			// If the x distance between the center of the ball and the center of the paddle is
-			// less than or equal to the ball's radius plus half the rectangle's width
-			// and the y distance between the center of the ball and the center of the paddle is
-			// less than or equal to the ball's radius plus half the rectangle's height
-			/*if (Math.abs(this.xPos - (paddle.xPos + paddle.width / 2)) <= this.size + paddle.width / 2 &&
-				Math.abs(this.yPos - (paddle.yPos + paddle.height / 2)) <= this.size + paddle.height / 2) {
-				//console.log("WOO");
-			}*/
 
 			// PYTHAGOREAN THEOREM (formula a2 + b2 = c2 or square root of a2 + b2 = c)
 			// Possibly refactor to get rid of sqrt for performance
@@ -314,6 +311,8 @@ const ball = {
 			);*/
 			
 			// Make dist x and dist y and see if colliding?
+
+			// THE HYPOTENUSE TO CHECK IS FOR THE TRIANGLE WITH SIDES WIDTH / 2 AND HEIGHT / 2
 
 			//------------------------------------------------------------------------------
 
