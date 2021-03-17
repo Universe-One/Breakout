@@ -219,7 +219,7 @@ const paddle = {
 }
 
 const ball = {
-	xPos: paddle.xPos + paddle.width / 2 - 40 - 4,
+	xPos: paddle.xPos + paddle.width / 2 - 40,
 	// Getter method is used for ball's yPos since its initial position is related to its size, and
 	// the size needs to be referred to with the this keyword.
 	get yPos() {
@@ -227,7 +227,7 @@ const ball = {
 		// this._yPos equals 0. If the OR operator is used, the left operand evaluates to false,
 		// resetting the y position of the ball to the bottom of the screen. This is not the
 		// intended behavior.
-		return this._yPos ?? canvas.height - (paddle.height * 2) - this.size + 16;
+		return this._yPos ?? canvas.height - (paddle.height * 2) - this.size - 50;
 	},
 	// Since yPos is accessed with a getter method, a setter method is necessary to change its value
 	set yPos(value) {
@@ -276,59 +276,30 @@ const ball = {
 			// circle's center lives inside (or on an edge/corner) of this new outer rectangle is not enough to determine if 
 			// the circle and rectangle are colliding. In fact, if the circle's center is on one of this outer rectangle's
 			// corners, then the circle is definitely not colliding with the rectangle. In short, there is more work to be done
-			// because of these corner cases. There is a small area near each corner which does not lead to a collision even
-			// if the circle's center resides in it. To fix this, and complete our modelling of the circle and original 
-			// rectangle's hitboxes, we have to round the corners of the outer, expanded rectangle. This new rectangle
+			// because of these corner cases. There is a small area near each corner of this outer rectangle which does not lead 
+			// to a collision even if the circle's center resides in it. To fix this, and complete our modelling of the circle 
+			// and original rectangle's hitboxes, we have to round the corners of the outer, expanded rectangle. This new rectangle
 			// with rounded corners will represent all of the points where the circle's center can be for there to be a 
 			// collision between the circle and the original rectangle.
 
+			// Before solving the corner cases, the following code first solves every remaining case that is not a corner case.
+			if (xDistBetweenCenters <= rect.width / 2) {
+				return true;
+			}
+			if (yDistBetweenCenters <= rect.height / 2) {
+				return true;
+			}
 
-			// THE FOLLOWING IS INCORRECT AND MUST BE FIXED
+			// The final step is to solve the corner cases. This is done by positing a triangle whose hypotenuse is the distance
+			// 
+			return Math.sqrt((xDistBetweenCenters - rect.width / 2) ** 2 + (yDistBetweenCenters - rect.height / 2) ** 2) 
+				   <= circle.size;
 
-			// To solve this corner case, the final step is to calculate the distance from the center of the rectangle
-			// to one of its corners, then add the radius of the circle to it. This will give us the farthest distance
-			// that the center of the circle can be from the center of the rectangle for the circle and rectangle to
-			// still be colliding. This means that any time the distance between the circle's center and the rectangle's
-			// center is less than or equal to this maximum distance, the circle and rectangle are colliding, and any time
-			// the distance between the two centers is greater than this maximum distance, the circle and rectangle
-			// are not colliding. By finding this maximum distance, we are effectively rounding the corners of the outer
-			// circle.
+			
 
-			// Possibly refactor since maxDist is static. NOT WORKING
-			/*let maxDist = Math.sqrt((paddle.width / 2) ** 2 + (paddle.height / 2) ** 2) + circle.size;
-			if (Math.sqrt(xDistBetweenCenters ** 2 + yDistBetweenCenters ** 2) <= maxDist) {
-				console.log(Math.sqrt(xDistBetweenCenters ** 2 + yDistBetweenCenters ** 2));
-				
-			}*/
-
-			// Rework begun
-			return Math.sqrt((xDistBetweenCenters - rect.width / 2) ** 2 + (yDistBetweenCenters - rect.height / 2) ** 2) <= circle.size;
 		}
 
 		console.log(circleRectCollision(this, paddle));
-
-		if (this.xPos >= paddle.xPos - this.size && this.xPos <= paddle.xPos + paddle.width + this.size && 
-			this.yPos >= paddle.yPos - this.size && this.yPos <= paddle.yPos + paddle.height + this.size) {
-
-
-			//------------------------------------------------------------------------------
-
-			//------------------------------------------------------------------------
-
-
-
-
-
-
-			// NEGATIVE 7 to 87 --------
-			//console.log(this.xPos - paddle.xPos);
-			if (this.yVel <= 0) {
-				this.yVel = -(this.yVel);
-			}
-
-		}
-
-
 
 
 
