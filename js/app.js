@@ -291,12 +291,14 @@ const ball = {
 			}
 
 			// The final step is to solve the corner cases. This is done by positing a triangle whose hypotenuse is the distance
-			// 
+			// from the center of the circle to the nearest corner of the rectangle. The other sides of this triangle are the
+			// are the x distance and the y distance from the center of the circle to the nearest corner of the rectangle. 
+			// If this hypotenuse is less than or equal to the radius of the circle, then the circle is touching the corner.
+			// The hypotenuse is equal to the circle's radius when the circle is touching the rectangle at exactly its
+			// corner, and is smaller than the circle's radius in all other cases near the corner. This gives us our bounding
+			// rounded rectangle, and we are finished.
 			return Math.sqrt((xDistBetweenCenters - rect.width / 2) ** 2 + (yDistBetweenCenters - rect.height / 2) ** 2) 
 				   <= circle.size;
-
-			
-
 		}
 
 		console.log(circleRectCollision(this, paddle));
