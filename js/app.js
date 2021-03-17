@@ -219,7 +219,7 @@ const paddle = {
 }
 
 const ball = {
-	xPos: paddle.xPos + paddle.width / 2 - 40 - 8,
+	xPos: paddle.xPos + paddle.width / 2 - 40 - 4,
 	// Getter method is used for ball's yPos since its initial position is related to its size, and
 	// the size needs to be referred to with the this keyword.
 	get yPos() {
@@ -283,18 +283,29 @@ const ball = {
 			// collision between the circle and the original rectangle.
 
 
-			// To solve this "corner" case...
+			// THE FOLLOWING IS INCORRECT AND MUST BE FIXED
 
-			// The next step is to calculate the distance from the center of the rectangle
+			// To solve this corner case, the final step is to calculate the distance from the center of the rectangle
 			// to one of its corners, then add the radius of the circle to it. This will give us the farthest distance
 			// that the center of the circle can be from the center of the rectangle for the circle and rectangle to
 			// still be colliding. This means that any time the distance between the circle's center and the rectangle's
-			// center is less than or equal to this maximum distance, the circle and rectangle are colliding. Any time
+			// center is less than or equal to this maximum distance, the circle and rectangle are colliding, and any time
 			// the distance between the two centers is greater than this maximum distance, the circle and rectangle
-			// are not colliding.
+			// are not colliding. By finding this maximum distance, we are effectively rounding the corners of the outer
+			// circle.
+
+			// Possibly refactor since maxDist is static. NOT WORKING
+			/*let maxDist = Math.sqrt((paddle.width / 2) ** 2 + (paddle.height / 2) ** 2) + circle.size;
+			if (Math.sqrt(xDistBetweenCenters ** 2 + yDistBetweenCenters ** 2) <= maxDist) {
+				console.log(Math.sqrt(xDistBetweenCenters ** 2 + yDistBetweenCenters ** 2));
+				
+			}*/
+
+			// Rework begun
+			return Math.sqrt((xDistBetweenCenters - rect.width / 2) ** 2 + (yDistBetweenCenters - rect.height / 2) ** 2) <= circle.size;
 		}
 
-		circleRectCollision(this, paddle);
+		console.log(circleRectCollision(this, paddle));
 
 		if (this.xPos >= paddle.xPos - this.size && this.xPos <= paddle.xPos + paddle.width + this.size && 
 			this.yPos >= paddle.yPos - this.size && this.yPos <= paddle.yPos + paddle.height + this.size) {
@@ -302,20 +313,7 @@ const ball = {
 
 			//------------------------------------------------------------------------------
 
-			// PYTHAGOREAN THEOREM (formula a2 + b2 = c2 or square root of a2 + b2 = c)
-			// Possibly refactor to get rid of sqrt for performance
-			/*console.log(
-				Math.sqrt(
-					Math.abs(this.xPos - (paddle.xPos + paddle.width / 2)) ** 2 + 
-				    Math.abs(this.yPos - (paddle.yPos + paddle.height / 2)) ** 2
-				)
-			);*/
-			
-			// Make dist x and dist y and see if colliding?
-
-			// THE HYPOTENUSE TO CHECK IS FOR THE TRIANGLE WITH SIDES WIDTH / 2 AND HEIGHT / 2
-
-			//------------------------------------------------------------------------------
+			//------------------------------------------------------------------------
 
 
 
