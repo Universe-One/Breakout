@@ -1,6 +1,6 @@
 // Update imports once other objects have been turned into their own modules
-import { game, ball } from "./app.js";
-
+import { game } from "./app.js";
+import ball from "./ball.js";
 
 // canvas variables suffixed with a 2 are related to the display on the bottom right corner of the
 // canvas container showing how many extra balls (lives) the player has left.

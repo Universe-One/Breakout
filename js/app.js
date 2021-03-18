@@ -6,8 +6,11 @@
 // the beginning of the program or only the first time a design pattern occurs.
 // Confine lives from 0/1-5 and update lives panel to reflect that
 
+// REMOVE canvasElem later
 import canvas, { ctx } from "./canvas.js";
 import canvas2 from "./canvas2.js";
+import ball from "./ball.js";
+import paddle from "./paddle.js";
 
 const scoreElem = document.querySelector("#current-score");
 const highScoreElem = document.querySelector("#high-score");
@@ -61,8 +64,6 @@ const game = {
 
 		paddle.handleMovement();
 		paddle.draw();
-
-
 
 
 		// BRICK STUFF
@@ -167,197 +168,13 @@ const game = {
 }
 
 
-
-const paddle = {
-	// The paddle should initially be drawn at the middle of the screen. However, fillRect treats
-	// the x argument as the left edge of the paddle, so we need to subtract half of the width of
-	// the paddle to center it. A getter function is used so that the width of the paddle can be
-	// referred to using this.width. A getter cannot return itself and a setter cannot set a value
-	// to itself because both of these cause infinite recursive calls. New properties must be created,
-	// and the convention is to prepend an underscore (_) to the getter/setter name.
-	get xPos() {
-		// Nullish coalescing operator is used instead of OR operator to handle the case when
-		// this._xPos equals 0. If the OR operator is used, the left operand evaluates to false,
-		// resetting the position of the paddle to the center of the screen. This is not the
-		// intended behavior.
-		return this._xPos ?? (canvas.width / 2) - (this.width / 2);
-	},
-	set xPos(value) {
-		this._xPos = value;
-	},
-	// width and moveSpeed values should be carefully chosen based on the value of the other, canvas.width, and
-	// the starting xPos to ensure that the paddle remains perfectly confined to the canvas (play area).
-	yPos: 368,
-	width: 80,
-	height: 16,
-	moveSpeed: 5,
-	// direction[0] is left direction and direction[1] is right direction. If a direction key is pressed, that
-	// pressed direction is represented by a 1. If it is not pressed, it is represented by a 0. Thus,
-	// [0, 0] amd [1, 1] mean no movement. [1, 0] means move left. [0, 1] means move right.
-	// direction is stored in this way to deal cases in which both direction keys are being pressed.
-	direction: [0, 0],
-	color: "rgb(0, 190, 255)",
-	draw: function() {
-		ctx.fillStyle = this.color;
-		ctx.fillRect(this.xPos, this.yPos, this.width, this.height);
-	},
-	handleMovement: function() {
-		if (this.direction[0] === 0 && this.direction[1] === 1 && this.xPos < canvas.width - this.width) {
-			this.xPos += this.moveSpeed;
-			// If the game is in the pre-start state, the ball's movement follows the paddle's movement.
-			// This makes it appear as though the ball is stuck to the center of the paddle.
-			if (game.preStart) {
-				ball.xPos += this.moveSpeed;
-			}
-		} else if (this.direction[0] === 1 && this.direction[1] === 0 && this.xPos > 0) {
-			this.xPos -= this.moveSpeed;
-			if (game.preStart) {
-				ball.xPos -= this.moveSpeed;
-			}
-		}
-	}
-}
-
-const ball = {
-	xPos: paddle.xPos + paddle.width / 2 - 40,
-	// Getter method is used for ball's yPos since its initial position is related to its size, and
-	// the size needs to be referred to with the this keyword.
-	get yPos() {
-		// Nullish coalescing operator is used instead of OR operator to handle the case when
-		// this._yPos equals 0. If the OR operator is used, the left operand evaluates to false,
-		// resetting the y position of the ball to the bottom of the screen. This is not the
-		// intended behavior.
-		return this._yPos ?? canvas.height - (paddle.height * 2) - this.size - 50;
-	},
-	// Since yPos is accessed with a getter method, a setter method is necessary to change its value
-	set yPos(value) {
-		this._yPos = value;
-	},
-	xVel: 0,
-	yVel: 0,
-	size: 8, // Used as radius of ball
-	speed: 10,
-	color: "rgb(0, 0, 255)",
-	draw: function() {
-		ctx.fillStyle = this.color;
-		ctx.beginPath();
-		// 2 * pi radians is equal to 360 degrees. This draws a full circle. The values of the first and second
-		// arguments are chosen to ensure that the ball is drawn sitting just on top of the middle of the paddle.
-		ctx.arc(this.xPos, this.yPos, this.size, 0, 2 * Math.PI);
-		ctx.fill();
-	},
-	move: function() {
-		ctx.arc(this.xPos += this.xVel, this.yPos -= this.yVel, this.size, 0, 2 * Math.PI);
-		this.detectCollision();
-	},
-	detectCollision: function() {
-		// Check if a circle is colliding with a rectangle. Used for ball and paddle collision detection, as well
-		// as ball and brick collision detection.
-		function circleRectCollision(circle, rect) {
-			let xDistBetweenCenters = Math.abs(circle.xPos - (rect.xPos + rect.width / 2));
-			let yDistBetweenCenters = Math.abs(circle.yPos - (rect.yPos + rect.height / 2));
-
-			// If the x distance between the center of the circle and the center of the rectangle is
-			// less than or equal to the circle's radius plus half the rectangle's width, there is no collision.
-			if (xDistBetweenCenters > circle.size + rect.width / 2) {
-				return false;
-			}
-			// If the y distance between the center of the circle and the center of the rectangle is
-			// less than or equal to the circle's radius plus half the rectangle's height, there is no collision.
-			if (yDistBetweenCenters > circle.size + rect.height / 2) {
-				return false;
-			}
-			// Therefore, if the function reaches this point, xDistBetweenCenters is less than or equal to the circle's 
-			// radius plus half the rectangle's width, and yDistBetweenCenters is less than or equal to the circle's
-			// radius plus half the rectangle's height. This means the circle is either touching the rectangle or 
-			// "relatively close" to touching it. The circle's center is somewhere inside (or resting on an edge or corner)
-			// of a new, expanded rectangle that surrounds the original rectangle. This new rectangle's dimensions are what
-			// would result from expanding each edge outward by the radius of the circle). However, knowing that the 
-			// circle's center lives inside (or on an edge/corner) of this new outer rectangle is not enough to determine if 
-			// the circle and rectangle are colliding. In fact, if the circle's center is on one of this outer rectangle's
-			// corners, then the circle is definitely not colliding with the rectangle. In short, there is more work to be done
-			// because of these corner cases. There is a small area near each corner of this outer rectangle which does not lead 
-			// to a collision even if the circle's center resides in it. To fix this, and complete our modelling of the circle 
-			// and original rectangle's hitboxes, we have to round the corners of the outer, expanded rectangle. This new rectangle
-			// with rounded corners will represent all of the points where the circle's center can be for there to be a 
-			// collision between the circle and the original rectangle.
-
-			// Before solving the corner cases, the following code first solves every remaining case that is not a corner case.
-			if (xDistBetweenCenters <= rect.width / 2) {
-				return true;
-			}
-			if (yDistBetweenCenters <= rect.height / 2) {
-				return true;
-			}
-
-			// The final step is to solve the corner cases. This is done by positing a triangle whose hypotenuse is the distance
-			// from the center of the circle to the nearest corner of the rectangle. The other sides of this triangle are the
-			// are the x distance and the y distance from the center of the circle to the nearest corner of the rectangle. 
-			// If this hypotenuse is less than or equal to the radius of the circle, then the circle is touching the corner.
-			// The hypotenuse is equal to the circle's radius when the circle is touching the rectangle at exactly its
-			// corner, and is smaller than the circle's radius in all other cases near the corner. This gives us our bounding
-			// rounded rectangle, and we are finished.
-			return Math.sqrt((xDistBetweenCenters - rect.width / 2) ** 2 + (yDistBetweenCenters - rect.height / 2) ** 2) 
-				   <= circle.size;
-		}
-
-		console.log(circleRectCollision(this, paddle));
-
-
-
-
-		// Detect collision with left and right walls
-		if (this.xPos <= 0 + this.size || this.xPos >= canvas.width - this.size) {
-			this.xVel = -(this.xVel);
-		}
-		// Detect collision with top wall
-		if (this.yPos <= 0 + this.size) {
-			this.yVel = -(this.yVel);
-
-		// Detect collision with a death plane below the bottom of the canvas. If the ball ever collides with this plane,
-		// a life is lost and if there is at least one more life remaining, the game reenters the preStart state in which 
-		// the ball sits atop the paddle waiting to be launched again. If there are no lives remaining, trigger game over.
-		} else if (this.yPos >= canvas.height + 100 - this.size && !game.preStart) {
-			
-			
-			// Refactor the following into RESET HANDLER FUNCTION
-
-			// Make the ball stop moving
-			this.xVel = 0;
-			this.yVel = 0;
-			// Lose a life
-			game.lives -= 1;
-			canvas2.clear();
-			canvas2.displayLives();
-			// After losing a life, if the player has at least one life remaining, reset the ball to the top of the 
-			// center of the paddle, and let the player launch it again.
-			if (game.lives >= 1) {
-				this.xPos = paddle.xPos + paddle.width / 2;
-				this.yPos = canvas.height - (paddle.height * 2) - this.size;
-				
-				// game.preStart is used to determine if a ball should rest atop the paddle. When a life is lost and at least
-				// 1 life remains, then this should happen. If the final life is lost, a ball should not be placed atop the paddle
-				// since it is game over. If the users restarts the game, then a ball will once again rest atop the paddle.
-				game.preStart = true;
-				window.addEventListener("keydown", game.startListener);
-			} else {
-				// Handle end-of-game operations
-				game.gameOver();
-			}
-		}
-	}
-}
-
 const brickField = {
 	numBricksInRow: 6,
 	numBricksInColumn: 6,
 
-
 	create: function() {
 
 	}
-
-
 }
 
 const Brick = function(xPos, yPos, hitsLeft) {
@@ -494,4 +311,4 @@ window.addEventListener("keydown", function(e) {
 });
 
 
-export { game, ball };
+export { game };
